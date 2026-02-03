@@ -8190,11 +8190,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Razor/Chirp.Razor.csproj",
+      "projectUniqueName": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Razor/Chirp.Razor.csproj",
       "projectName": "Chirp.Razor",
-      "projectPath": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Razor/Chirp.Razor.csproj",
+      "projectPath": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Razor/Chirp.Razor.csproj",
       "packagesPath": "/Users/alexa/.nuget/packages/",
-      "outputPath": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Razor/obj/",
+      "outputPath": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Razor/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/alexa/.nuget/NuGet/NuGet.Config"
@@ -8209,8 +8209,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Services/Chirp.Services.csproj": {
-              "projectPath": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Services/Chirp.Services.csproj"
+            "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Services/Chirp.Services.csproj": {
+              "projectPath": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Services/Chirp.Services.csproj"
             }
           }
         }

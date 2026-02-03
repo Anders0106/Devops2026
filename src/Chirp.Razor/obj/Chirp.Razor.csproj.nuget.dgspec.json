@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Razor/Chirp.Razor.csproj": {}
+    "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Razor/Chirp.Razor.csproj": {}
   },
   "projects": {
-    "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Core/Chirp.Core.csproj": {
+    "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Core/Chirp.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Core/Chirp.Core.csproj",
+        "projectUniqueName": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Core/Chirp.Core.csproj",
         "projectName": "Chirp.Core",
-        "projectPath": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Core/Chirp.Core.csproj",
+        "projectPath": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Core/Chirp.Core.csproj",
         "packagesPath": "/Users/alexa/.nuget/packages/",
-        "outputPath": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Core/obj/",
+        "outputPath": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Core/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/alexa/.nuget/NuGet/NuGet.Config"
@@ -94,14 +94,14 @@
         }
       }
     },
-    "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Razor/Chirp.Razor.csproj": {
+    "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Razor/Chirp.Razor.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Razor/Chirp.Razor.csproj",
+        "projectUniqueName": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Razor/Chirp.Razor.csproj",
         "projectName": "Chirp.Razor",
-        "projectPath": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Razor/Chirp.Razor.csproj",
+        "projectPath": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Razor/Chirp.Razor.csproj",
         "packagesPath": "/Users/alexa/.nuget/packages/",
-        "outputPath": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Razor/obj/",
+        "outputPath": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Razor/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/alexa/.nuget/NuGet/NuGet.Config"
@@ -116,8 +116,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Services/Chirp.Services.csproj": {
-                "projectPath": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Services/Chirp.Services.csproj"
+              "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Services/Chirp.Services.csproj": {
+                "projectPath": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Services/Chirp.Services.csproj"
               }
             }
           }
@@ -207,14 +207,14 @@
         }
       }
     },
-    "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Repositories/Chirp.Repositories.csproj": {
+    "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Repositories/Chirp.Repositories.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Repositories/Chirp.Repositories.csproj",
+        "projectUniqueName": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Repositories/Chirp.Repositories.csproj",
         "projectName": "Chirp.Repositories",
-        "projectPath": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Repositories/Chirp.Repositories.csproj",
+        "projectPath": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Repositories/Chirp.Repositories.csproj",
         "packagesPath": "/Users/alexa/.nuget/packages/",
-        "outputPath": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Repositories/obj/",
+        "outputPath": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Repositories/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/alexa/.nuget/NuGet/NuGet.Config"
@@ -229,8 +229,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Core/Chirp.Core.csproj": {
-                "projectPath": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Core/Chirp.Core.csproj"
+              "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Core/Chirp.Core.csproj": {
+                "projectPath": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Core/Chirp.Core.csproj"
               }
             }
           }
@@ -269,14 +269,14 @@
         }
       }
     },
-    "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Services/Chirp.Services.csproj": {
+    "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Services/Chirp.Services.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Services/Chirp.Services.csproj",
+        "projectUniqueName": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Services/Chirp.Services.csproj",
         "projectName": "Chirp.Services",
-        "projectPath": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Services/Chirp.Services.csproj",
+        "projectPath": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Services/Chirp.Services.csproj",
         "packagesPath": "/Users/alexa/.nuget/packages/",
-        "outputPath": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Services/obj/",
+        "outputPath": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Services/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/alexa/.nuget/NuGet/NuGet.Config"
@@ -291,8 +291,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Repositories/Chirp.Repositories.csproj": {
-                "projectPath": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Repositories/Chirp.Repositories.csproj"
+              "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Repositories/Chirp.Repositories.csproj": {
+                "projectPath": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Repositories/Chirp.Repositories.csproj"
               }
             }
           }

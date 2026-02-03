@@ -3053,11 +3053,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Core/Chirp.Core.csproj",
+      "projectUniqueName": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Core/Chirp.Core.csproj",
       "projectName": "Chirp.Core",
-      "projectPath": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Core/Chirp.Core.csproj",
+      "projectPath": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Core/Chirp.Core.csproj",
       "packagesPath": "/Users/alexa/.nuget/packages/",
-      "outputPath": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Core/obj/",
+      "outputPath": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Core/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/alexa/.nuget/NuGet/NuGet.Config"

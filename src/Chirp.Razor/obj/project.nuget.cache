@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "NE95CxD3rPw=",
+  "dgSpecHash": "hNhPI9h9gq8=",
   "success": true,
-  "projectFilePath": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Razor/Chirp.Razor.csproj",
+  "projectFilePath": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Razor/Chirp.Razor.csproj",
   "expectedPackageFiles": [
     "/Users/alexa/.nuget/packages/aspnet.security.oauth.github/8.2.0/aspnet.security.oauth.github.8.2.0.nupkg.sha512",
     "/Users/alexa/.nuget/packages/humanizer/2.14.1/humanizer.2.14.1.nupkg.sha512",

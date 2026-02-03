@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "7sZmftr76v4=",
+  "dgSpecHash": "+hfjfDMb974=",
   "success": true,
-  "projectFilePath": "/Users/alexa/Desktop/itu-minitwit/src/Chirp.Services/Chirp.Services.csproj",
+  "projectFilePath": "/Users/alexa/Desktop/PROG/Devops2026/src/Chirp.Services/Chirp.Services.csproj",
   "expectedPackageFiles": [
     "/Users/alexa/.nuget/packages/microsoft.aspnetcore.cryptography.internal/8.0.8/microsoft.aspnetcore.cryptography.internal.8.0.8.nupkg.sha512",
     "/Users/alexa/.nuget/packages/microsoft.aspnetcore.cryptography.keyderivation/8.0.8/microsoft.aspnetcore.cryptography.keyderivation.8.0.8.nupkg.sha512",
