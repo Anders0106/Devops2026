@@ -1,0 +1,20 @@
+@page "/timeline"
+@using Chirp.Core.Classes
+@model Chirp.Razor.Pages.MyTimelineModel
+@inject SignInManager<Author> SignInManager
+@inject UserManager<Author> UserManager
+@{
+    ViewData["Title"] = "Chirp!";
+    Layout = "Shared/_Layout";
+}
+<div class="holder">
+    @if (SignInManager.IsSignedIn(User) && User.Identity?.Name != null){
+        <h2> @User.Identity?.Name's Timeline </h2>
+        <partial name="_CheepBoxPartial" />
+    } 
+    else 
+    {
+        <h2> Author not found! :( </h2>
+    }
+    <partial name="_CheepListPartial" model="(Model.Cheeps, Model.CheepRange, Model.PageNumber, Model.TotalPages, Model.UserAuthor, Model.FollowedAuthors)" />
+</div>

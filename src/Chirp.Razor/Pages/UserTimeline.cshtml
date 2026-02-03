@@ -1,0 +1,42 @@
+﻿@page "/{author}"
+@using Chirp.Core.Classes
+@model Chirp.Razor.Pages.UserTimelineModel
+@inject SignInManager<Author> SignInManager
+@inject UserManager<Author> UserManager
+@{
+    ViewData["Title"] = "Chirp!";
+    Layout = "Shared/_Layout";
+}
+<div class="holder">
+    @if (Model.Author != null){
+        <h2> @Model.Author?.UserName's Timeline </h2>
+        @if (Model.Author != null && User.Identity != null && User.Identity.IsAuthenticated && User.Identity.Name != Model.Author.UserName)
+        {
+            @if (!(Model.FollowedAuthors?.Any(f => f.Id == Model.Author.Id) ?? false))
+            {
+                <form method="post" asp-page-handler="Follow">
+                    <input type="hidden" name="followed" value="@Model.Author.UserName" />
+                    <button class="follow-btn" align="right">Follow</button>
+                </form>
+
+            }
+            else
+            {
+                <form method="post" asp-page-handler="Unfollow">
+                    <input type="hidden" name="unfollowed" value="@Model.Author.UserName" />
+                    <button class="follow-btn" align="right">Unfollow</button>
+                </form>
+            }
+        }
+    } 
+    else 
+    {
+        <h2> Author not found! :( </h2>
+    }
+    
+    @if (SignInManager.IsSignedIn(User) && Model.Author?.UserName == User.Identity?.Name)
+    {
+        <partial name="_CheepBoxPartial" />
+    }
+    <partial name="_CheepListPartial" model="(Model.Cheeps, Model.CheepRange, Model.PageNumber, Model.TotalPages, Model.UserAuthor, Model.FollowedAuthors)" />
+</div>

@@ -1,8 +1,10 @@
-init:
-	python -c"from minitwit import init_db; init_db()"
-
 build:
-	gcc flag_tool.c -l sqlite3 -o flag_tool
-
+	dotnet build
 clean:
-	rm flag_tool
+	dotnet clean
+restore:
+	dotnet restore
+watch:
+	dotnet watch --project ./src/Chirp.CLI/ $(type) $(args)
+run:
+	dotnet run --project ./src/Chirp.CLI/ $(type) $(args)
