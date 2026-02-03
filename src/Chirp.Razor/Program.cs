@@ -22,22 +22,22 @@ builder.Services.AddDefaultIdentity<Author>(options => options.SignIn.RequireCon
 builder.Services.AddRazorPages();
 builder.Services.AddControllersWithViews();
 
-string? githubClientId = builder.Configuration["GITHUBCLIENTID"];
-string? githubClientSecret = builder.Configuration["GITHUBCLIENTSECRET"];
-if (string.IsNullOrEmpty(githubClientId) || string.IsNullOrEmpty(githubClientSecret))
-{
-	throw new Exception("GitHub Client ID and Client Secret must be set in the configuration.");
-}
+// string? githubClientId = builder.Configuration["GITHUBCLIENTID"];
+// string? githubClientSecret = builder.Configuration["GITHUBCLIENTSECRET"];
+// if (string.IsNullOrEmpty(githubClientId) || string.IsNullOrEmpty(githubClientSecret))
+// {
+// 	throw new Exception("GitHub Client ID and Client Secret must be set in the configuration.");
+// }
 
 builder.Services.AddAuthentication()
-	.AddCookie()
-	.AddGitHub(o =>
-	{
-		o.ClientId = githubClientId; // Need to default to something ??
-		o.ClientSecret = githubClientSecret;
-		o.Scope.Add("user:email");
-		// o.CallbackPath = "/signin-github";
-	});
+	.AddCookie();
+	// .AddGitHub(o =>
+	// {
+	// 	o.ClientId = githubClientId; // Need to default to something ??
+	// 	o.ClientSecret = githubClientSecret;
+	// 	o.Scope.Add("user:email");
+	// 	// o.CallbackPath = "/signin-github";
+	// });
 
 
 var app = builder.Build();

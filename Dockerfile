@@ -16,7 +16,7 @@ RUN dotnet restore src/Chirp.Razor/Chirp.Razor.csproj
 # Copy source code and build
 COPY src/ ./src/
 
-RUN dotnet publish src/Chirp.Razor/Chirp.Razor.csproj -c Release -o /app/publish --no-restore
+RUN dotnet publish src/Chirp.Razor/Chirp.Razor.csproj -c Release -o /app/publish
 
 # Use the official .NET runtime image to run the app
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
