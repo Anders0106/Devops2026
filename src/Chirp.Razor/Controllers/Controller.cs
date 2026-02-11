@@ -133,11 +133,11 @@ public class Controller : ControllerBase
     }
 
     [HttpPost("/register")]
-    public async Task<IActionResult> Register([FromBody] RegisterRequest credentials)
+    public async Task<IActionResult> Register([FromBody] RegisterRequest credentials, [FromQuery] int? latest)
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState);
+            return BadRequest(ModelState.Values.SelectMany(v => v.Errors));
         }
 
         if (await _userManager.FindByNameAsync(credentials.Username) != null)
@@ -151,6 +151,8 @@ public class Controller : ControllerBase
         await _emailStore.SetEmailAsync(user, credentials.Email, CancellationToken.None);
         var result = await _userManager.CreateAsync(user, credentials.Password);
 
+        //somehow update latest
+        
         if (result.Succeeded)
         {
             return NoContent();
