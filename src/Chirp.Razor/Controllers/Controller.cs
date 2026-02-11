@@ -137,7 +137,7 @@ public class Controller : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState.Values.SelectMany(v => v.Errors));
+            return BadRequest(ModelState);
         }
 
         if (await _userManager.FindByNameAsync(credentials.Username) != null)
