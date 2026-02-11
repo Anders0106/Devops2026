@@ -1,5 +1,7 @@
 using Chirp.Repositories.Repositories;
+using Chirp.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Chirp.Razor.Controllers;
 
@@ -8,11 +10,13 @@ public class Controller : ControllerBase
 {
 	private readonly ChirpDBContext _context;
 	private readonly IServiceProvider _provider;
-	public Controller(ChirpDBContext context, IServiceProvider provider)
+    private readonly ICheepService _service;
+	public Controller(ChirpDBContext context, IServiceProvider provider, ICheepService service)
 	{
 		_context = context;
 		_provider = provider;
-	}
+        _service = service;
+    }
     [HttpGet("/fllws/{username}")]                 
     public IActionResult Follows(string username)
     {
@@ -34,14 +38,65 @@ public class Controller : ControllerBase
         return Ok();
     }
     [HttpGet("/msgs/{username}")]                 
-    public IActionResult MessagesByUser(string username)
+    public IActionResult MessagesByUser(
+        string username,
+        [FromHeader] string authorization,
+        [FromQuery] string? latest,
+        [FromQuery] int? no)
     {
-        return Ok();
+        
+        if (authorization != "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh")                
+        {                                                                         
+            return Unauthorized();                                                
+        }
+
+        var cheeps = _context.Cheeps
+            .Include(c => c.Author)
+            .Where(c => EF.Functions.Collate(c.Author.UserName, "NOCASE") == username)
+            .OrderByDescending(c => c.TimeStamp)
+            .Take(no ?? 100)
+            .ToList();
+
+        return Ok(cheeps.Select(c => new                                              
+        {                                                                             
+            content = c.Text,                                                         
+            pub_date = c.TimeStamp,                                                   
+            user = c.Author.UserName                                                  
+        }));      
     }
-    [HttpPost("/msgs/{username}")]                 
-    public IActionResult PostNewMessage(string username)
+    [HttpPost("/msgs/{username}")]
+    public IActionResult PostNewMessage(
+        string username,
+        [FromQuery] int? latest,
+        [FromHeader] string authorization,
+        [FromBody] MessageRequest request)
     {
-        return Ok();
+        if (authorization != "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh")
+        {
+            return Unauthorized();
+        }
+
+        var author = _service.GetAuthorByName(username);
+        if (author == null)
+        {
+            return NotFound($"User '{username}' not found");
+        }
+
+        var cheep = new Chirp.Core.DTO.CheepDTO
+        {
+            Text = request.Content,
+            TimeStamp = DateTime.UtcNow,
+            Author = _service.ToDomain(author)
+        };
+
+        _service.CreateCheep(cheep);
+
+        return NoContent();
+    }
+
+    public class MessageRequest
+    {
+        public required string Content { get; set; }
     }  
     [HttpPost("/register")]              
     public IActionResult Register()
