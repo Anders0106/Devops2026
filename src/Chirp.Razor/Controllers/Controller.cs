@@ -1,5 +1,9 @@
+using System.ComponentModel.DataAnnotations;
+using Chirp.Core.Classes;
 using Chirp.Repositories.Repositories;
 using Chirp.Services.Interfaces;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,12 +15,22 @@ public class Controller : ControllerBase
 	private readonly ChirpDBContext _context;
 	private readonly IServiceProvider _provider;
     private readonly ICheepService _service;
-	public Controller(ChirpDBContext context, IServiceProvider provider, ICheepService service)
-	{
-		_context = context;
-		_provider = provider;
+    private readonly UserManager<Author> _userManager;
+    private readonly IUserStore<Author> _userStore;
+    private readonly IUserEmailStore<Author> _emailStore;
+
+    public Controller(ChirpDBContext context, IServiceProvider provider, ICheepService service,
+        UserManager<Author> userManager, IUserStore<Author> userStore)
+    {
+        _context = context;
+        _provider = provider;
         _service = service;
+        _userManager = userManager;
+        _userStore = userStore;
+        _emailStore = (IUserEmailStore<Author>)_userStore;
     }
+    
+
     [HttpGet("/fllws/{username}")]                 
     public IActionResult Follows(string username)
     {
@@ -98,9 +112,52 @@ public class Controller : ControllerBase
     {
         public required string Content { get; set; }
     }  
-    [HttpPost("/register")]              
-    public IActionResult Register()
+    
+    public class RegisterRequest
     {
-        return Ok();
-    }  
+        [Required]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 3)]
+        [Display(Name = "Username")]
+        public string Username { get; set; }
+
+        [Required]
+        [EmailAddress]
+        [Display(Name = "Email")]
+        public string Email { get; set; }
+
+        [Required]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(Name = "Password")]
+        public string Password { get; set; }
+    }
+
+    [HttpPost("/register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest credentials)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        if (await _userManager.FindByNameAsync(credentials.Username) != null)
+        {
+            return BadRequest("Username already exists");
+        }
+
+        var user = Activator.CreateInstance<Author>();
+
+        await _userStore.SetUserNameAsync(user, credentials.Username, CancellationToken.None);
+        await _emailStore.SetEmailAsync(user, credentials.Email, CancellationToken.None);
+        var result = await _userManager.CreateAsync(user, credentials.Password);
+
+        if (result.Succeeded)
+        {
+            return NoContent();
+        } 
+        else
+        {
+            return BadRequest(result.Errors);
+        }
+    }
 }
