@@ -12,12 +12,14 @@ namespace Chirp.Razor.Controllers;
 [ApiController]
 public class Controller : ControllerBase
 {
-	private readonly ChirpDBContext _context;
-	private readonly IServiceProvider _provider;
+    private readonly ChirpDBContext _context;
+    private readonly IServiceProvider _provider;
     private readonly ICheepService _service;
     private readonly UserManager<Author> _userManager;
     private readonly IUserStore<Author> _userStore;
     private readonly IUserEmailStore<Author> _emailStore;
+
+    private int _latest = 0;
 
     public Controller(ChirpDBContext context, IServiceProvider provider, ICheepService service,
         UserManager<Author> userManager, IUserStore<Author> userStore)
@@ -29,39 +31,98 @@ public class Controller : ControllerBase
         _userStore = userStore;
         _emailStore = (IUserEmailStore<Author>)_userStore;
     }
-    
 
-    [HttpGet("/fllws/{username}")]                 
-    public IActionResult Follows(string username)
+    private bool IsAuthorized(string authorization)
     {
-        return Ok();
-    } 
-    [HttpPost("/fllws/{username}")]                 
-    public IActionResult Follow(string username)
-    {
-        return Ok();    
+        return authorization == "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh";
     }
-    [HttpGet("/latest")]                 
+
+
+    [HttpGet("/fllws/{username}")]
+    public IActionResult Follows(string username, [FromHeader] string authorization,
+        [FromQuery] int? latest, [FromQuery] int? no)
+    {
+        if (!IsAuthorized(authorization))
+        {
+            return Unauthorized();
+        }
+
+        var follows = _context.Follows
+            .Where(f => f.Follower.UserName == username)
+            .OrderByDescending(f => f.Followed.UserName)
+            .Take(no ?? 100)
+            .ToList();
+
+        if (latest != null)
+        {
+            _latest = latest.Value;
+        }
+
+        return Ok(follows.Select(f => _context.Authors.FirstOrDefault(a => a.Id == f.FollowedId)?.UserName));
+    }
+    [HttpPost("/fllws/{username}")]
+    public IActionResult Follow(string username, [FromHeader] string authorization,
+        [FromQuery] int? latest, [FromBody] FollowRequest request)
+    {
+        if (!IsAuthorized(authorization))
+        {
+            return Unauthorized();
+        }
+
+        var follower = _service.GetAuthorByName(username);
+        if (follower == null) return NotFound($"User '{username}' not found");
+
+        if (request.Follow != null)
+        {
+            var followed = _service.GetAuthorByName(request.Follow);
+            if (followed == null) return NotFound($"User '{request.Follow}' not found");
+            _service.Follow(follower, followed);
+        }
+        else if (request.Unfollow != null)
+        {
+            var unfollowed = _service.GetAuthorByName(request.Unfollow);
+            if (unfollowed == null) return NotFound($"User '{request.Unfollow}' not found");
+            _service.Unfollow(follower, unfollowed);
+        }
+        else
+        {
+            return BadRequest("Request must contain either 'follow' or 'unfollow'");
+        }
+
+        if (latest != null)
+        {
+            _latest = latest.Value;
+        }
+
+        return NoContent();
+    }
+
+    public class FollowRequest
+    {
+        public string? Follow { get; set; }
+        public string? Unfollow { get; set; }
+    }
+    [HttpGet("/latest")]
     public IActionResult Latest()
     {
         return Ok();
     }
-    [HttpGet("/msgs")]                 
+    [HttpGet("/msgs")]
     public IActionResult RecentMessages()
     {
         return Ok();
     }
-    [HttpGet("/msgs/{username}")]                 
+    [HttpGet("/msgs/{username}")]
     public IActionResult MessagesByUser(
         string username,
         [FromHeader] string authorization,
         [FromQuery] string? latest,
         [FromQuery] int? no)
     {
-        
-        if (authorization != "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh")                
-        {                                                                         
-            return Unauthorized();                                                
+
+        if (!IsAuthorized(authorization))
+        {
+            return Unauthorized();
         }
 
         var cheeps = _context.Cheeps
@@ -71,12 +132,12 @@ public class Controller : ControllerBase
             .Take(no ?? 100)
             .ToList();
 
-        return Ok(cheeps.Select(c => new                                              
-        {                                                                             
-            content = c.Text,                                                         
-            pub_date = c.TimeStamp,                                                   
-            user = c.Author.UserName                                                  
-        }));      
+        return Ok(cheeps.Select(c => new
+        {
+            content = c.Text,
+            pub_date = c.TimeStamp,
+            user = c.Author.UserName
+        }));
     }
     [HttpPost("/msgs/{username}")]
     public IActionResult PostNewMessage(
@@ -85,7 +146,7 @@ public class Controller : ControllerBase
         [FromHeader] string authorization,
         [FromBody] MessageRequest request)
     {
-        if (authorization != "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh")
+        if (!IsAuthorized(authorization))
         {
             return Unauthorized();
         }
@@ -111,8 +172,8 @@ public class Controller : ControllerBase
     public class MessageRequest
     {
         public required string Content { get; set; }
-    }  
-    
+    }
+
     public class RegisterRequest
     {
         [Required]
@@ -152,11 +213,11 @@ public class Controller : ControllerBase
         var result = await _userManager.CreateAsync(user, credentials.Password);
 
         //somehow update latest
-        
+
         if (result.Succeeded)
         {
             return NoContent();
-        } 
+        }
         else
         {
             return BadRequest(result.Errors);
