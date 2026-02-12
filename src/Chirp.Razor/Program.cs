@@ -52,20 +52,8 @@ using (var scope = app.Services.CreateScope())
 		throw new Exception("Could not get ChirpDBContext from service provider.");
 	}
 
-	await context.Database.EnsureCreatedAsync();
-
-	// Execute the migration from code.
-	try
-	{
-		context.Database.Migrate();
-	}
-	catch (Exception ex)
-	{
-		Console.WriteLine(ex.Message);
-	}
-
-	if (app.Environment.IsDevelopment())
-		DbInitializer.WipeDatabase(context);
+	// Apply migrations (creates DB if it doesn't exist)
+	context.Database.Migrate();
 
 	var authors = DbInitializer.SeedDatabase(context);
 	DbInitializer.SetAuthorPasswords(authors, scope.ServiceProvider);

@@ -21,7 +21,7 @@ public class Model : PageModel
 	public int PageNumber { get; set; }
 	public int TotalPages { get; set; }
 	public Range CheepRange { get; set; }
-	public List<CheepDTO>? Cheeps { get; set; }
+	public List<CheepDTO> Cheeps { get; set; } = [];
 	public AuthorDTO? Author { get; set; }
 	public AuthorDTO? UserAuthor { get; set; }
 	public List<AuthorDTO> FollowedAuthors { get; set; } = [];
