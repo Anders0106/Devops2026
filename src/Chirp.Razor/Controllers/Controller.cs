@@ -53,7 +53,7 @@ public class Controller : ControllerBase
             .Take(no ?? 100)
             .ToList();
 
-        if (latest != null)
+        if (latest.HasValue)
         {
             _latest = latest.Value;
         }
@@ -89,7 +89,7 @@ public class Controller : ControllerBase
             return BadRequest("Request must contain either 'follow' or 'unfollow'");
         }
 
-        if (latest != null)
+        if (latest.HasValue)
         {
             _latest = latest.Value;
         }
@@ -105,7 +105,7 @@ public class Controller : ControllerBase
     [HttpGet("/latest")]
     public IActionResult Latest()
     {
-        return Ok();
+        return Ok(_latest);
     }
     [HttpGet("/msgs")]
     public IActionResult RecentMessages()
@@ -116,13 +116,18 @@ public class Controller : ControllerBase
     public IActionResult MessagesByUser(
         string username,
         [FromHeader] string authorization,
-        [FromQuery] string? latest,
+        [FromQuery] int? latest,
         [FromQuery] int? no)
     {
 
         if (!IsAuthorized(authorization))
         {
             return Unauthorized();
+        }
+
+        if (latest.HasValue)
+        {
+            _latest = latest.Value;
         }
 
         var cheeps = _context.Cheeps
@@ -149,6 +154,11 @@ public class Controller : ControllerBase
         if (!IsAuthorized(authorization))
         {
             return Unauthorized();
+        }
+
+        if (latest.HasValue)
+        {
+            _latest = latest.Value;
         }
 
         var author = _service.GetAuthorByName(username);
@@ -196,6 +206,7 @@ public class Controller : ControllerBase
     [HttpPost("/register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest credentials, [FromQuery] int? latest)
     {
+        Console.WriteLine("Register!");
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
@@ -213,6 +224,10 @@ public class Controller : ControllerBase
         var result = await _userManager.CreateAsync(user, credentials.Password);
 
         //somehow update latest
+        if (latest.HasValue)
+        {
+            _latest = latest.Value;
+        }
 
         if (result.Succeeded)
         {
