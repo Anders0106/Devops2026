@@ -19,7 +19,7 @@ public class Controller : ControllerBase
     private readonly IUserStore<Author> _userStore;
     private readonly IUserEmailStore<Author> _emailStore;
 
-    private int _latest = 0;
+    private static int _latest = 0;
 
     public Controller(ChirpDBContext context, IServiceProvider provider, ICheepService service,
         UserManager<Author> userManager, IUserStore<Author> userStore)
@@ -228,6 +228,7 @@ public class Controller : ControllerBase
         {
             _latest = latest.Value;
         }
+        Console.WriteLine(_latest);
 
         if (result.Succeeded)
         {
