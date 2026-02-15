@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Chirp.Core.Classes;
 using Chirp.Repositories.Repositories;
 using Chirp.Services.Interfaces;
@@ -6,6 +5,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.Net;
 
 namespace Chirp.Razor.Controllers;
 
@@ -107,10 +108,36 @@ public class Controller : ControllerBase
     {
         return Ok(_latest);
     }
+
     [HttpGet("/msgs")]
-    public IActionResult RecentMessages()
-    {
-        return Ok();
+    public IActionResult RecentMessages(
+    [FromHeader]
+    string authorization,
+    [FromQuery] int? latest,
+    [FromQuery] int? no)
+{
+        if (!IsAuthorized(authorization))
+        {
+            return Unauthorized();
+    }
+
+        if (latest.HasValue)
+        {
+        _latest = latest.Value;
+        }
+
+        var cheeps = _context.Cheeps
+            .Include(c => c.Author)
+            .OrderByDescending(c => c.TimeStamp)
+            .Take(no ?? 100)
+            .ToList();
+
+        return Ok(cheeps.Select(c => new
+        {
+            content = c.Text,
+            pub_date = c.TimeStamp,
+            user = c.Author.UserName
+        }));
     }
     [HttpGet("/msgs/{username}")]
     public IActionResult MessagesByUser(
