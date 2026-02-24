@@ -230,7 +230,7 @@ public class Controller : ControllerBase
         UpdateLatest(latest);
 
         if (result.Succeeded)
-            return NoContent();
+            return StatusCode(StatusCodes.Status204NoContent);
 
         var errorMsg = string.Join("; ", result.Errors.Select(e => e.Description));
         return BadRequest(new { status = 400, error_msg = errorMsg });
