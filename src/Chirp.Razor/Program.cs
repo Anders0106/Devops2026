@@ -16,8 +16,16 @@ builder.Services.AddScoped<ICheepRepository, CheepRepository>();
 string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ChirpDBContext>(options => options.UseSqlite(connectionString, b => b.MigrationsAssembly("Chirp.Razor")));
 
-builder.Services.AddDefaultIdentity<Author>(options => options.SignIn.RequireConfirmedAccount = false)
-	.AddEntityFrameworkStores<ChirpDBContext>();
+builder.Services.AddDefaultIdentity<Author>(options =>
+{
+	options.SignIn.RequireConfirmedAccount = false;
+	options.Password.RequireDigit = false;
+	options.Password.RequireLowercase = false;
+	options.Password.RequireUppercase = false;
+	options.Password.RequireNonAlphanumeric = false;
+	options.Password.RequiredLength = 1;
+	options.Password.RequiredUniqueChars = 1;
+}).AddEntityFrameworkStores<ChirpDBContext>();
 
 builder.Services.Configure<PasswordHasherOptions>(options => options.IterationCount = 1000);
 
@@ -47,15 +55,35 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-	// From the scope, get an instance of our database context.
-	// Through the using keyword, we make sure to dispose it after we are done.
 	using var context = scope.ServiceProvider.GetService<ChirpDBContext>();
 	if (context == null)
 	{
 		throw new Exception("Could not get ChirpDBContext from service provider.");
 	}
 
-	// Apply migrations (creates DB if it doesn't exist)
+	// If tables already exist but are not tracked in migration history (e.g. from a
+	// previous EnsureCreated call or a stale Docker volume), mark pending migrations
+	// as applied so Migrate() does not try to recreate existing tables.
+	var pending = context.Database.GetPendingMigrations().ToList();
+	if (pending.Count > 0)
+	{
+		var dbConn = context.Database.GetDbConnection();
+		dbConn.Open();
+		using var checkCmd = dbConn.CreateCommand();
+		checkCmd.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='AspNetRoles'";
+		var tablesExist = (long)checkCmd.ExecuteScalar()! > 0;
+		dbConn.Close();
+
+		if (tablesExist)
+		{
+			foreach (var migration in pending)
+			{
+				context.Database.ExecuteSql(
+					$"INSERT OR IGNORE INTO __EFMigrationsHistory (MigrationId, ProductVersion) VALUES ({migration}, '8.0.8')");
+			}
+		}
+	}
+
 	context.Database.Migrate();
 
 	var authors = DbInitializer.SeedDatabase(context);
@@ -84,7 +112,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
-app.MapDefaultControllerRoute();
+app.MapControllers();
 
 app.Run();
 
