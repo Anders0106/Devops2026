@@ -34,68 +34,70 @@ public class Controller : ControllerBase
         _emailStore = (IUserEmailStore<Author>)_userStore;
     }
 
-    private bool IsAuthorized(string authorization)
+    private static readonly object Forbidden =
+        new { status = 403, error_msg = "You are not authorized to use this resource!" };
+
+    private bool IsAuthorized(string authorization) =>
+        authorization == "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh";
+
+    private void UpdateLatest(int? latest)
     {
-        return authorization == "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh";
+        if (latest.HasValue) _latest = latest.Value;
     }
 
+    [HttpGet("/latest")]
+    public IActionResult Latest() => Ok(new { latest = _latest });
 
     [HttpGet("/fllws/{username}")]
     public IActionResult Follows(string username, [FromHeader] string authorization,
         [FromQuery] int? latest, [FromQuery] int? no)
     {
         if (!IsAuthorized(authorization))
-        {
-            return Unauthorized();
-        }
+            return StatusCode(403, Forbidden);
+
+        var user = _service.GetAuthorByName(username);
+        if (user == null) return NotFound();
+
+        UpdateLatest(latest);
 
         var follows = _context.Follows
             .Where(f => f.Follower.UserName == username)
             .OrderByDescending(f => f.Followed.UserName)
             .Take(no ?? 100)
+            .Select(f => _context.Authors.FirstOrDefault(a => a.Id == f.FollowedId)!.UserName)
             .ToList();
 
-        if (latest.HasValue)
-        {
-            _latest = latest.Value;
-        }
-
-        return Ok(follows.Select(f => _context.Authors.FirstOrDefault(a => a.Id == f.FollowedId)?.UserName));
+        return Ok(new { follows });
     }
+
     [HttpPost("/fllws/{username}")]
     public IActionResult Follow(string username, [FromHeader] string authorization,
         [FromQuery] int? latest, [FromBody] FollowRequest request)
     {
         if (!IsAuthorized(authorization))
-        {
-            return Unauthorized();
-        }
+            return StatusCode(403, Forbidden);
 
         var follower = _service.GetAuthorByName(username);
-        if (follower == null) return NotFound($"User '{username}' not found");
+        if (follower == null) return NotFound();
 
         if (request.Follow != null)
         {
             var followed = _service.GetAuthorByName(request.Follow);
-            if (followed == null) return NotFound($"User '{request.Follow}' not found");
+            if (followed == null) return NotFound();
             _service.Follow(follower, followed);
         }
         else if (request.Unfollow != null)
         {
             var unfollowed = _service.GetAuthorByName(request.Unfollow);
-            if (unfollowed == null) return NotFound($"User '{request.Unfollow}' not found");
+            if (unfollowed == null) return NotFound();
             _service.Unfollow(follower, unfollowed);
         }
         else
         {
-            return BadRequest("Request must contain either 'follow' or 'unfollow'");
+            return BadRequest(new { status = 400, error_msg = "Request must contain either 'follow' or 'unfollow'" });
         }
 
-        if (latest.HasValue)
-        {
-            _latest = latest.Value;
-        }
-
+        UpdateLatest(latest);
         return NoContent();
     }
 
@@ -104,28 +106,17 @@ public class Controller : ControllerBase
         public string? Follow { get; set; }
         public string? Unfollow { get; set; }
     }
-    [HttpGet("/latest")]
-    public IActionResult Latest()
-    {
-        return Ok(_latest);
-    }
 
     [HttpGet("/msgs")]
     public IActionResult RecentMessages(
-    [FromHeader]
-    string authorization,
-    [FromQuery] int? latest,
-    [FromQuery] int? no)
-{
+        [FromHeader] string authorization,
+        [FromQuery] int? latest,
+        [FromQuery] int? no)
+    {
         if (!IsAuthorized(authorization))
-        {
-            return Unauthorized();
-    }
+            return StatusCode(403, Forbidden);
 
-        if (latest.HasValue)
-        {
-        _latest = latest.Value;
-        }
+        UpdateLatest(latest);
 
         var cheeps = _context.Cheeps
             .Include(c => c.Author)
@@ -140,6 +131,7 @@ public class Controller : ControllerBase
             user = c.Author.UserName
         }));
     }
+
     [HttpGet("/msgs/{username}")]
     public IActionResult MessagesByUser(
         string username,
@@ -147,16 +139,13 @@ public class Controller : ControllerBase
         [FromQuery] int? latest,
         [FromQuery] int? no)
     {
-
         if (!IsAuthorized(authorization))
-        {
-            return Unauthorized();
-        }
+            return StatusCode(403, Forbidden);
 
-        if (latest.HasValue)
-        {
-            _latest = latest.Value;
-        }
+        var user = _service.GetAuthorByName(username);
+        if (user == null) return NotFound();
+
+        UpdateLatest(latest);
 
         var cheeps = _context.Cheeps
             .Include(c => c.Author)
@@ -172,6 +161,7 @@ public class Controller : ControllerBase
             user = c.Author.UserName
         }));
     }
+
     [HttpPost("/msgs/{username}")]
     public IActionResult PostNewMessage(
         string username,
@@ -180,20 +170,12 @@ public class Controller : ControllerBase
         [FromBody] MessageRequest request)
     {
         if (!IsAuthorized(authorization))
-        {
-            return Unauthorized();
-        }
-
-        if (latest.HasValue)
-        {
-            _latest = latest.Value;
-        }
+            return StatusCode(403, Forbidden);
 
         var author = _service.GetAuthorByName(username);
-        if (author == null)
-        {
-            return NotFound($"User '{username}' not found");
-        }
+        if (author == null) return NotFound();
+
+        UpdateLatest(latest);
 
         var cheep = new Chirp.Core.DTO.CheepDTO
         {
@@ -203,7 +185,6 @@ public class Controller : ControllerBase
         };
 
         _service.CreateCheep(cheep);
-
         return NoContent();
     }
 
@@ -235,37 +216,23 @@ public class Controller : ControllerBase
     [HttpPost("/register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest credentials, [FromQuery] int? latest)
     {
-        Console.WriteLine("Register!");
         if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
+            return BadRequest(new { status = 400, error_msg = "Invalid request body" });
 
         if (await _userManager.FindByNameAsync(credentials.Username) != null)
-        {
-            return BadRequest("Username already exists");
-        }
+            return BadRequest(new { status = 400, error_msg = "Username already exists" });
 
         var user = Activator.CreateInstance<Author>();
-
         await _userStore.SetUserNameAsync(user, credentials.Username, CancellationToken.None);
         await _emailStore.SetEmailAsync(user, credentials.Email, CancellationToken.None);
         var result = await _userManager.CreateAsync(user, credentials.Password);
 
-        //somehow update latest
-        if (latest.HasValue)
-        {
-            _latest = latest.Value;
-        }
-        Console.WriteLine(_latest);
+        UpdateLatest(latest);
 
         if (result.Succeeded)
-        {
             return NoContent();
-        }
-        else
-        {
-            return BadRequest(result.Errors);
-        }
+
+        var errorMsg = string.Join("; ", result.Errors.Select(e => e.Description));
+        return BadRequest(new { status = 400, error_msg = errorMsg });
     }
 }
