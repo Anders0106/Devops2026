@@ -3,6 +3,7 @@ using Chirp.Repositories.Interfaces;
 using Chirp.Repositories.Repositories;
 using Chirp.Services;
 using Chirp.Services.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,8 @@ builder.Services.AddDbContext<ChirpDBContext>(options => options.UseSqlite(conne
 
 builder.Services.AddDefaultIdentity<Author>(options => options.SignIn.RequireConfirmedAccount = false)
 	.AddEntityFrameworkStores<ChirpDBContext>();
+
+builder.Services.Configure<PasswordHasherOptions>(options => options.IterationCount = 1000);
 
 
 builder.Services.AddRazorPages();
