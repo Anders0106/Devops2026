@@ -103,7 +103,9 @@ public class Controller : ControllerBase
 
     public class FollowRequest
     {
+        [JsonPropertyName("follow")]
         public string? Follow { get; set; }
+        [JsonPropertyName("unfollow")]
         public string? Unfollow { get; set; }
     }
 
@@ -190,6 +192,7 @@ public class Controller : ControllerBase
 
     public class MessageRequest
     {
+        [JsonPropertyName("content")]
         public required string Content { get; set; }
     }
 
