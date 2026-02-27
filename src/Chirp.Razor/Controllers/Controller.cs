@@ -196,10 +196,11 @@ public class Controller : ControllerBase
     public class RegisterRequest
     {
         [Required]
+        [JsonPropertyName("username")]
         public string Username { get; set; }
 
         [Required]
-        [EmailAddress]
+        [JsonPropertyName("email")]
         public string Email { get; set; }
 
         [Required]
