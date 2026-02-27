@@ -25,6 +25,7 @@ builder.Services.AddDefaultIdentity<Author>(options =>
 	options.Password.RequireNonAlphanumeric = false;
 	options.Password.RequiredLength = 1;
 	options.Password.RequiredUniqueChars = 1;
+	options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ ";
 }).AddEntityFrameworkStores<ChirpDBContext>();
 
 builder.Services.Configure<PasswordHasherOptions>(options => options.IterationCount = 1000);
