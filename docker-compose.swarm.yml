@@ -4,7 +4,7 @@
 
 services:
   chirp-web:
-    image: 2970/chirp-web:latest
+    image: ghcr.io/Anders0106/Devops2026:latest
     ports:
       - "8080:80"
     environment:
