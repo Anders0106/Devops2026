@@ -1,0 +1,52 @@
+# Docker Compose for Swarm production deployment
+# Deploy with: docker stack deploy -c docker-compose.swarm.yml chirp
+# Requires: docker swarm init (if not already initialized)
+
+services:
+  chirp-web:
+    image: 2970/chirp-web:latest
+    ports:
+      - "8080:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80
+    volumes:
+      - chirp-data:/app/Assets
+    deploy:
+      replicas: 1
+      update_config:
+        order: start-first
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      rollback_config:
+        order: stop-first
+        parallelism: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      labels:
+        - shepherd.enable=true
+
+  shepherd:
+    image: containrrr/shepherd
+    environment:
+      - SLEEP_TIME=5m
+      - ROLLBACK_ON_FAILURE=true
+      - FILTER_SERVICES=label=shepherd.enable=true
+      # Uncomment for Docker Hub auth (avoids rate limits):
+      # - WITH_REGISTRY_AUTH=true
+      # - REGISTRY_USER=2970
+      # - REGISTRY_PASSWORD=${REGISTRY_PASSWORD}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  chirp-data:
