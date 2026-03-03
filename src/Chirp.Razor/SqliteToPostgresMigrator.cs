@@ -174,3 +174,4 @@ public static class SqliteToPostgresMigrator
 		await SetSequenceAsync("AspNetRoleClaims", "Id");
 		await SetSequenceAsync("AspNetUserClaims", "Id");
 	}
+}
