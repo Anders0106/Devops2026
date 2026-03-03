@@ -5,11 +5,14 @@
 services:
   chirp-web:
     image: ghcr.io/anders0106/devops2026:latest
+    depends_on:
+      - db
     ports:
       - "8080:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=chirp;Username=postgres;Password=postgres
     volumes:
       - chirp-data:/app/Assets
     deploy:
@@ -27,7 +30,23 @@ services:
         delay: 5s
       labels:
         - shepherd.enable=true
-
+  db:
+    image: postgres:17-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=chirp
+    ports:
+      - "5432:5432"
+    volumes:
+      - chirp-db:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
   shepherd:
     image: containrrr/shepherd
     environment:
@@ -50,3 +69,4 @@ services:
 
 volumes:
   chirp-data:
+  chirp-db:

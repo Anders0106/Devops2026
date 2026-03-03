@@ -1,4 +1,5 @@
 using Chirp.Core.Classes;
+using Chirp.Razor;
 using Chirp.Repositories.Interfaces;
 using Chirp.Repositories.Repositories;
 using Chirp.Services;
@@ -14,7 +15,7 @@ builder.Services.AddScoped<ICheepService, CheepService>();
 builder.Services.AddScoped<ICheepRepository, CheepRepository>();
 
 string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ChirpDBContext>(options => options.UseSqlite(connectionString, b => b.MigrationsAssembly("Chirp.Razor")));
+builder.Services.AddDbContext<ChirpDBContext>(options => options.UseNpgsql(connectionString, b => b.MigrationsAssembly("Chirp.Razor")));
 
 builder.Services.AddDefaultIdentity<Author>(options =>
 {
@@ -71,21 +72,25 @@ using (var scope = app.Services.CreateScope())
 		var dbConn = context.Database.GetDbConnection();
 		dbConn.Open();
 		using var checkCmd = dbConn.CreateCommand();
-		checkCmd.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='AspNetRoles'";
-		var tablesExist = (long)checkCmd.ExecuteScalar()! > 0;
+		checkCmd.CommandText = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'AspNetRoles'";
+		var tablesExist = Convert.ToInt64(checkCmd.ExecuteScalar()!) > 0;
 		dbConn.Close();
 
 		if (tablesExist)
 		{
 			foreach (var migration in pending)
 			{
-				context.Database.ExecuteSql(
-					$"INSERT OR IGNORE INTO __EFMigrationsHistory (MigrationId, ProductVersion) VALUES ({migration}, '8.0.8')");
+				context.Database.ExecuteSqlRaw(
+					"INSERT INTO \"__EFMigrationsHistory\" (\"MigrationId\", \"ProductVersion\") SELECT {0}, '8.0.8' WHERE NOT EXISTS (SELECT 1 FROM \"__EFMigrationsHistory\" WHERE \"MigrationId\" = {1})",
+					migration, migration);
 			}
 		}
 	}
 
 	context.Database.Migrate();
+
+	var sqlitePath = builder.Configuration["Chirp:SqliteMigrationPath"] ?? "Assets/chirp.db";
+	SqliteToPostgresMigrator.MigrateIfNeededAsync(context, sqlitePath).GetAwaiter().GetResult();
 
 	var authors = DbInitializer.SeedDatabase(context);
 	DbInitializer.SetAuthorPasswords(authors, scope.ServiceProvider);

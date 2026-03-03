@@ -23,7 +23,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 
 WORKDIR /app
 
-# Create Assets directory for SQLite database
+# Create Assets directory
 RUN mkdir -p /app/Assets
 
 # Copy the published output from the build stage
