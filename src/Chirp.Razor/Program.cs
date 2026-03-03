@@ -88,7 +88,8 @@ using (var scope = app.Services.CreateScope())
 	context.Database.Migrate();
 
 	var sqlitePath = builder.Configuration["Chirp:SqliteMigrationPath"] ?? "Assets/chirp.db";
-	SqliteToPostgresMigrator.MigrateIfNeededAsync(context, sqlitePath).GetAwaiter().GetResult();
+	var logger = scope.ServiceProvider.GetService<ILogger<Program>>();
+	SqliteToPostgresMigrator.MigrateIfNeededAsync(context, sqlitePath, logger).GetAwaiter().GetResult();
 
 	var authors = DbInitializer.SeedDatabase(context);
 	DbInitializer.SetAuthorPasswords(authors, scope.ServiceProvider).GetAwaiter().GetResult();

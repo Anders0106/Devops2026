@@ -1,5 +1,6 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 
 namespace Chirp.Razor;
@@ -28,11 +29,17 @@ public static class SqliteToPostgresMigrator
 	public static async Task MigrateIfNeededAsync(
 		Chirp.Repositories.Repositories.ChirpDBContext pgContext,
 		string sqlitePath,
+		ILogger? logger = null,
 		CancellationToken cancellationToken = default)
 	{
-		var resolvedPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, sqlitePath));
-		if (!File.Exists(resolvedPath))
+		var resolvedPath = ResolveSqlitePath(sqlitePath);
+		if (resolvedPath == null)
+		{
+			logger?.LogDebug("SQLite migration skipped: no chirp.db found at {Path} (tried BaseDirectory, CurrentDirectory, /app)", sqlitePath);
 			return;
+		}
+
+		logger?.LogInformation("Found SQLite database at {Path}, checking if migration needed", resolvedPath);
 
 		var pgConn = (NpgsqlConnection)pgContext.Database.GetDbConnection();
 		if (pgConn.State != System.Data.ConnectionState.Open)
@@ -44,8 +51,13 @@ public static class SqliteToPostgresMigrator
 			checkCmd.CommandText = "SELECT COUNT(*) FROM \"AspNetUsers\"";
 			var count = Convert.ToInt32(await checkCmd.ExecuteScalarAsync(cancellationToken));
 			if (count > 0)
+			{
+				logger?.LogDebug("SQLite migration skipped: PostgreSQL already has {Count} users", count);
 				return;
+			}
 		}
+
+		logger?.LogInformation("Migrating data from SQLite to PostgreSQL");
 
 		// Ensure schema exists (Migrate should have run before this)
 		var sqliteConnStr = $"Data Source={resolvedPath}";
@@ -65,6 +77,27 @@ public static class SqliteToPostgresMigrator
 		}
 
 		await UpdatePostgresSequencesAsync(pgConn, cancellationToken);
+		logger?.LogInformation("SQLite to PostgreSQL migration completed successfully");
+	}
+
+	private static string? ResolveSqlitePath(string sqlitePath)
+	{
+		var pathsToTry = new List<string>();
+		if (Path.IsPathRooted(sqlitePath))
+			pathsToTry.Add(sqlitePath);
+		else
+		{
+			pathsToTry.Add(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, sqlitePath)));
+			pathsToTry.Add(Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), sqlitePath)));
+			pathsToTry.Add(Path.Combine("/app", sqlitePath));
+		}
+
+		foreach (var p in pathsToTry)
+		{
+			if (File.Exists(p))
+				return p;
+		}
+		return null;
 	}
 
 	private static async Task<bool> TableExistsAsync(SqliteConnection conn, string tableName, CancellationToken ct)
