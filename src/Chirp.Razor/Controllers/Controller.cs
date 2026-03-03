@@ -151,7 +151,7 @@ public class Controller : ControllerBase
 
         var cheeps = _context.Cheeps
             .Include(c => c.Author)
-            .Where(c => EF.Functions.Collate(c.Author.UserName, "NOCASE") == username)
+            .Where(c => c.Author.UserName != null && username != null && c.Author.UserName.ToLower() == username.ToLower())
             .OrderByDescending(c => c.TimeStamp)
             .Take(no ?? 100)
             .ToList();
