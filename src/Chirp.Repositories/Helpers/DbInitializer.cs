@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 public static class DbInitializer
 {
-	public static async void SetAuthorPasswords(List<Author> authors, IServiceProvider serviceProvider)
+	public static async Task SetAuthorPasswords(List<Author> authors, IServiceProvider serviceProvider)
 	{
 
 		var userManager = serviceProvider.GetService<UserManager<Author>>();

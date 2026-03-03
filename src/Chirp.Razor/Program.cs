@@ -59,11 +59,7 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-	using var context = scope.ServiceProvider.GetService<ChirpDBContext>();
-	if (context == null)
-	{
-		throw new Exception("Could not get ChirpDBContext from service provider.");
-	}
+	var context = scope.ServiceProvider.GetRequiredService<ChirpDBContext>();
 
 	// If tables already exist but are not tracked in migration history (e.g. from a
 	// previous EnsureCreated call or a stale Docker volume), mark pending migrations
@@ -95,7 +91,7 @@ using (var scope = app.Services.CreateScope())
 	SqliteToPostgresMigrator.MigrateIfNeededAsync(context, sqlitePath).GetAwaiter().GetResult();
 
 	var authors = DbInitializer.SeedDatabase(context);
-	DbInitializer.SetAuthorPasswords(authors, scope.ServiceProvider);
+	DbInitializer.SetAuthorPasswords(authors, scope.ServiceProvider).GetAwaiter().GetResult();
 }
 
 // Configure the HTTP request pipeline.
