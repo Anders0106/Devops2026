@@ -17,7 +17,8 @@ builder.Services.AddScoped<ICheepService, CheepService>();
 builder.Services.AddScoped<ICheepRepository, CheepRepository>();
 
 string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ChirpDBContext>(options => options.UseNpgsql(connectionString, b => b.MigrationsAssembly("Chirp.Razor")));
+builder.Services.AddDbContext<ChirpDBContext>(options =>
+    options.UseNpgsql(connectionString, b => b.MigrationsAssembly("Chirp.Razor")));
 
 builder.Services.AddDefaultIdentity<Author>(options =>
 {
@@ -59,40 +60,11 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-	var context = scope.ServiceProvider.GetRequiredService<ChirpDBContext>();
-
-	// If tables already exist but are not tracked in migration history (e.g. from a
-	// previous EnsureCreated call or a stale Docker volume), mark pending migrations
-	// as applied so Migrate() does not try to recreate existing tables.
-	var pending = context.Database.GetPendingMigrations().ToList();
-	if (pending.Count > 0)
-	{
-		var dbConn = context.Database.GetDbConnection();
-		dbConn.Open();
-		using var checkCmd = dbConn.CreateCommand();
-		checkCmd.CommandText = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'AspNetRoles'";
-		var tablesExist = Convert.ToInt64(checkCmd.ExecuteScalar()!) > 0;
-		dbConn.Close();
-
-		if (tablesExist)
-		{
-			foreach (var migration in pending)
-			{
-				context.Database.ExecuteSqlRaw(
-					"INSERT INTO \"__EFMigrationsHistory\" (\"MigrationId\", \"ProductVersion\") SELECT {0}, '8.0.8' WHERE NOT EXISTS (SELECT 1 FROM \"__EFMigrationsHistory\" WHERE \"MigrationId\" = {1})",
-					migration, migration);
-			}
-		}
-	}
-
-	context.Database.Migrate();
-
-	var sqlitePath = builder.Configuration["Chirp:SqliteMigrationPath"] ?? "Assets/chirp.db";
-	SqliteToPostgresMigrator.MigrateIfNeededAsync(context, sqlitePath).GetAwaiter().GetResult();
-
-	var authors = DbInitializer.SeedDatabase(context);
-	DbInitializer.SetAuthorPasswords(authors, scope.ServiceProvider).GetAwaiter().GetResult();
+    var context = scope.ServiceProvider.GetRequiredService<ChirpDBContext>();
+    context.Database.Migrate();
 }
+
+Console.WriteLine(builder.Configuration.GetConnectionString("DefaultConnection"));
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
