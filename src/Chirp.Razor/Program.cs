@@ -6,6 +6,7 @@ using Chirp.Services;
 using Chirp.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Prometheus;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
@@ -47,24 +48,24 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddAuthentication()
 	.AddCookie();
-	// .AddGitHub(o =>
-	// {
-	// 	o.ClientId = githubClientId; // Need to default to something ??
-	// 	o.ClientSecret = githubClientSecret;
-	// 	o.Scope.Add("user:email");
-	// 	// o.CallbackPath = "/signin-github";
-	// });
-
+// .AddGitHub(o =>
+// {
+// 	o.ClientId = githubClientId; // Need to default to something ??
+// 	o.ClientSecret = githubClientSecret;
+// 	o.Scope.Add("user:email");
+// 	// o.CallbackPath = "/signin-github";
+// });
+Console.WriteLine("CONN: " + builder.Configuration.GetConnectionString("DefaultConnection"));
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+/*using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ChirpDBContext>();
     context.Database.Migrate();
-}
+}*/
 
-Console.WriteLine(builder.Configuration.GetConnectionString("DefaultConnection"));
+//Console.WriteLine(builder.Configuration.GetConnectionString("DefaultConnection"));
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -83,12 +84,14 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseHttpMetrics();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();
+app.MapMetrics();
 
 app.Run();
 
