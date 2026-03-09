@@ -2,3 +2,4 @@ build/
 dist/
 bin/
 obj/
+.env

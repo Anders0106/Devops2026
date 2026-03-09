@@ -1,5 +1,6 @@
 using Chirp.Core.Classes;
 using Chirp.Razor;
+using Prometheus;
 using Chirp.Repositories.Interfaces;
 using Chirp.Repositories.Repositories;
 using Chirp.Services;
@@ -83,12 +84,14 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseHttpMetrics();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();
+app.MapMetrics();
 
 app.Run();
 

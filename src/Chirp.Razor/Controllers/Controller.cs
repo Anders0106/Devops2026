@@ -187,6 +187,7 @@ public class Controller : ControllerBase
         };
 
         _service.CreateCheep(cheep);
+        Chirp.Razor.ChirpMetrics.CheepsCreated.Inc();
         return NoContent();
     }
 

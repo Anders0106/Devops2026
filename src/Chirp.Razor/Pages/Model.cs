@@ -156,6 +156,7 @@ public class Model : PageModel
 		};
 
 		_service.CreateCheep(cheep);
+		ChirpMetrics.CheepsCreated.Inc();
 
 		return RedirectToPage();
 	}
@@ -189,6 +190,7 @@ public class Model : PageModel
 		};
 
 		_service.AddComment(comment);
+		ChirpMetrics.CommentsAdded.Inc();
 
 		return RedirectToPage();
 	}
