@@ -52,7 +52,9 @@ services:
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter:v0.15.0
     environment:
-      - DATA_SOURCE_URI=postgresql://postgres:postgres@db:5432/chirp?sslmode=disable
+      - DATA_SOURCE_URI=db:5432/chirp?sslmode=disable
+      - DATA_SOURCE_USER=postgres
+      - DATA_SOURCE_PASS=postgres
     depends_on:
       - db
     deploy:
@@ -108,6 +110,7 @@ services:
         target: /etc/grafana/provisioning/datasources/datasources.yml
     volumes:
       - grafana-data:/var/lib/grafana
+      - ./monitoring/dashboards:/etc/grafana/provisioning/dashboards
     deploy:
       replicas: 1
       restart_policy:
