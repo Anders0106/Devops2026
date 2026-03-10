@@ -26,7 +26,7 @@ jobs:
           OUTPUT=$(devskim analyze -I src/ \
             -g "**/launchSettings.json,**/appsettings.json" \
             -f text \
-            --exit-code)
+            -E)
           EXIT=$?
           if [ -z "$OUTPUT" ]; then
             echo "### DevSkim Security Scan" >> $GITHUB_STEP_SUMMARY
