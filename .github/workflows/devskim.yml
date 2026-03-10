@@ -21,8 +21,20 @@ jobs:
         run: dotnet tool install --global Microsoft.CST.DevSkim.CLI
 
       - name: Run DevSkim scan
-        run: devskim analyze -I src/ \
-              --ignore "Chirp.Razor/Properties/launchSettings.json" \
-              --ignore "Chirp.Razor/appsettings.json" \
-              --exit-code \
-              -f text
+        run: |
+          set +e
+          OUTPUT=$(devskim analyze -I src/ \
+            -g "**/launchSettings.json,**/appsettings.json" \
+            -f text \
+            --exit-code)
+          EXIT=$?
+          if [ -z "$OUTPUT" ]; then
+            echo "### DevSkim Security Scan" >> $GITHUB_STEP_SUMMARY
+            echo "No issues found." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### DevSkim Security Scan" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "$OUTPUT" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+          exit $EXIT
