@@ -24,7 +24,7 @@ jobs:
         run: |
           set +e
           OUTPUT=$(devskim analyze -I src/ \
-            -g "**/launchSettings.json" \
+            -g "**/launchSettings.json,**/appsettings.json" \
             -f text \
             -E)
           EXIT=$?
