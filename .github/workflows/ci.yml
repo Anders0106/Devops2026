@@ -28,6 +28,7 @@ jobs:
       - name: Build
         run: dotnet build
       - name: Install Playwright browsers
-        run: dotnet tool install --global Microsoft.Playwright.CLI --version 1.49.0 && playwright install --with-deps chromium
+        run: pwsh playwright.ps1 install --with-deps
+        working-directory: test/Chirp.Tests/bin/Debug/net8.0
       - name: Run tests
         run: make test
