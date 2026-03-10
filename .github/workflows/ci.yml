@@ -28,6 +28,6 @@ jobs:
       - name: Build
         run: dotnet build
       - name: Install Playwright browsers
-        run: pwsh test/Chirp.Tests/bin/Debug/net8.0/playwright.ps1 install --with-deps
+        run: pwsh ${{ github.workspace }}/test/Chirp.Tests/bin/Debug/net8.0/playwright.ps1 install --with-deps
       - name: Run tests
         run: make test
