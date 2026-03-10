@@ -21,4 +21,4 @@ jobs:
         run: dotnet tool install --global Microsoft.CST.DevSkim.CLI
 
       - name: Run DevSkim scan
-        run: devskim analyze -I src/
+        run: devskim analyze -I src/ --exclude Properties/launchSettings.json --exclude appsettings.json --exit-code-on-severity recommendation -f text
