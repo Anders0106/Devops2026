@@ -1,3 +1,4 @@
+.PHONY: build clean restore watch run test
 build:
 	dotnet build
 clean:
@@ -8,3 +9,5 @@ watch:
 	dotnet watch --project ./src/Chirp.CLI/ $(type) $(args)
 run:
 	dotnet run --project ./src/Chirp.CLI/ $(type) $(args)
+test:
+	dotnet test
