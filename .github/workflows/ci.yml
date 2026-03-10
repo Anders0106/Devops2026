@@ -31,3 +31,5 @@ jobs:
         run: npx playwright@1.49.0 install --with-deps chromium
       - name: Run tests
         run: make test
+        env:
+          ASPNETCORE_URLS: http://localhost:5273
