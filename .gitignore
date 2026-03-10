@@ -3,5 +3,3 @@ dist/
 bin/
 obj/
 .env
-*.sql
-.sql
