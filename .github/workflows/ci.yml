@@ -26,9 +26,8 @@ jobs:
         with:
           dotnet-version: '8.0'
       - name: Build
-        run: dotnet build
+        run: dotnet build test/Chirp.Tests/Chirp.Tests.csproj
       - name: Install Playwright browsers
-        run: pwsh playwright.ps1 install --with-deps
-        working-directory: test/Chirp.Tests/bin/Debug/net8.0
+        run: pwsh test/Chirp.Tests/bin/Debug/net8.0/playwright.ps1 install --with-deps
       - name: Run tests
         run: make test
