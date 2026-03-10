@@ -21,4 +21,8 @@ jobs:
         run: dotnet tool install --global Microsoft.CST.DevSkim.CLI
 
       - name: Run DevSkim scan
-        run: devskim analyze -I src/ --exclude Properties/launchSettings.json --exclude appsettings.json --exit-code-on-severity recommendation -f text
+        run: devskim analyze -I src/ \
+              --ignore "Chirp.Razor/Properties/launchSettings.json" \
+              --ignore "Chirp.Razor/appsettings.json" \
+              --exit-code \
+              -f text
