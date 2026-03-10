@@ -26,8 +26,8 @@ jobs:
         with:
           dotnet-version: '8.0'
       - name: Build
-        run: dotnet build test/Chirp.Tests/Chirp.Tests.csproj
+        run: dotnet build
       - name: Install Playwright browsers
-        run: pwsh -File ${{ github.workspace }}/test/Chirp.Tests/bin/Debug/net8.0/playwright.ps1 install --with-deps
+        run: dotnet tool install --global Microsoft.Playwright.CLI --version 1.49.0 && playwright install --with-deps chromium
       - name: Run tests
         run: make test
