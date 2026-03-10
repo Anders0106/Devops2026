@@ -2,7 +2,6 @@
 using Chirp.Repositories.Repositories;
 using Chirp.Services;
 using Chirp.Tests.Helpers;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
@@ -18,7 +17,6 @@ namespace Chirp.Tests.Tests
 
 		// dissable nullable warnings since the fields are initialized in the setup method
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-		private DatabaseHelper _fixture;
 		private CheepRepository _cheepRepo;
 		private ChirpDBContext _context;
 		private CheepService _cheepService;
@@ -30,11 +28,12 @@ namespace Chirp.Tests.Tests
 		public async Task Init()
 		{
 			await ServerHelper.StartServer(); // Starts the server before each test
-			var path = "../../../../../src/Chirp.Razor/Assets/chirp.db";
-			var fullPath = Path.GetFullPath(path);
-			var connectionString = $"Data Source={fullPath};";
-			_fixture = new DatabaseHelper(connectionString);
-			_context = _fixture.CreateContext();
+			var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
+				?? "Host=localhost;Port=5432;Database=chirp;Username=postgres;Password=postgres";
+			var options = new DbContextOptionsBuilder<ChirpDBContext>()
+				.UseNpgsql(connectionString)
+				.Options;
+			_context = new ChirpDBContext(options);
 			_cheepRepo = new CheepRepository(_context);
 			_cheepService = new CheepService(_cheepRepo);
 			_browser = await Playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions { Headless = true });
@@ -116,9 +115,8 @@ namespace Chirp.Tests.Tests
 
 		[TearDown]
 		public void Cleanup()
-		{ 
+		{
 			_context.Dispose();
-			_fixture.Dispose();
 
 		}
 

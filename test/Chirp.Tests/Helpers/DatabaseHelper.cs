@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Chirp.Tests.Helpers;
 
-// ref: https://learn.microsoft.com/en-us/ef/core/testing/testing-with-the-database 
+// ref: https://learn.microsoft.com/en-us/ef/core/testing/testing-with-the-database
 public class DatabaseHelper : IDisposable
 {
 	public readonly SqliteConnection ConnectionString;
@@ -28,10 +28,10 @@ public class DatabaseHelper : IDisposable
 
 		// Optionally, apply pending migrations if necessary
 		context.Database.Migrate();  // Apply any pending migrations to ensure all tables (including Identity) are created
-		
+
 		// Seed the database with initial data, if necessary
 		Authors = DbInitializer.SeedDatabase(context);
-		
+
 		// TODO - run dbinitializer.setpasswords() somehow
 	}
 
@@ -49,4 +49,3 @@ public class DatabaseHelper : IDisposable
 		ConnectionString.Dispose();  // Cleanup
 	}
 }
-
