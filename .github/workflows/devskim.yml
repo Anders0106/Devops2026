@@ -5,16 +5,15 @@ on:
     branches:
       - main
 
+
 jobs:
   devskim:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0
 
@@ -22,9 +21,4 @@ jobs:
         run: dotnet tool install --global Microsoft.CST.DevSkim.CLI
 
       - name: Run DevSkim scan
-        run: devskim analyze -I src/ -f sarif -o devskim.sarif
-
-      - name: Upload SARIF report
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: devskim.sarif
+        run: devskim analyze -I src/
