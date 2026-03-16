@@ -96,6 +96,42 @@ services:
       restart_policy:
         condition: on-failure
 
+  loki:
+    image: grafana/loki:3.6.0
+    user: "0"
+    command: -config.file=/etc/loki/loki-config.yaml
+    ports:
+      - "3100:3100"
+    configs:
+      - source: loki_config
+        target: /etc/loki/loki-config.yaml
+    volumes:
+      - loki-data:/loki
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  promtail:
+    image: grafana/promtail:3.6.0
+    command: -config.file=/etc/promtail/promtail-config.yaml
+    configs:
+      - source: promtail_config
+        target: /etc/promtail/promtail-config.yaml
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/log:/var/log:ro
+    depends_on:
+      - loki
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.platform.os == linux
+
   grafana:
     image: grafana/grafana:11.2.0
     environment:
@@ -121,9 +157,14 @@ configs:
     file: ./monitoring/prometheus.yml
   grafana_datasources:
     file: ./monitoring/datasources.yml
+  loki_config:
+    file: ./monitoring/loki-config.yaml
+  promtail_config:
+    file: ./monitoring/promtail-config.yaml
 
 volumes:
   chirp-data:
   chirp-db:
   prometheus-data:
   grafana-data:
+  loki-data:
