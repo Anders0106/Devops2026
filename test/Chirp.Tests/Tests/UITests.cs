@@ -72,6 +72,12 @@ namespace Chirp.Tests.Tests
 			await PlaywrightHelper.TearDown(_page, _browser);
 		}
 		
+		[OneTimeSetUp]
+		public async Task StartServer()
+		{
+			await ServerHelper.StartServer(); //Starts the server before all tests run.
+		}
+
 		[OneTimeTearDown]
 		public void StopServer()
 		{

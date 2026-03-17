@@ -79,11 +79,8 @@ namespace Chirp.Tests.Tests
 
 			Assert.True(cheepExists);
 
-			//User goes to the public timeline and clicks on a user which isn't them.
-			await PlaywrightHelper.AccessPublicTimeline(_page);
-			//Just taking a seeded cheep by a user who we know is there.
-			await _page.GetByRole(AriaRole.Link, new PageGetByRoleOptions() { Name = "Jacqualine Gilcoine" }).Nth(0)
-				.ClickAsync();
+			//User navigates directly to a seeded user's timeline to follow them.
+			await _page.GotoAsync("http://localhost:5273/Jacqualine%20Gilcoine");
 
 			//User follows the user.
 			await _page.GetByRole(AriaRole.Button, new() { Name = "Follow" }).ClickAsync();
