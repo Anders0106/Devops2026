@@ -118,7 +118,10 @@ public class Controller : ControllerBase
         [FromQuery] int? no)
     {
         if (!IsAuthorized(authorization))
+        {
+            _logger.LogWarning("Unauthorized request for recent messages");  
             return StatusCode(403, Forbidden);
+        }
 
         UpdateLatest(latest);
 
@@ -127,6 +130,8 @@ public class Controller : ControllerBase
             .OrderByDescending(c => c.TimeStamp)
             .Take(no ?? 100)
             .ToList();
+        
+        _logger.LogInformation("Fetched {Count} recent messages", cheeps.Count);  
 
         return Ok(cheeps.Select(c => new
         {
