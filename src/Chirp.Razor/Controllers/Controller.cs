@@ -48,17 +48,28 @@ public class Controller : ControllerBase
     }
 
     [HttpGet("/latest")]
-    public IActionResult Latest() => Ok(new { latest = _latest });
+    public IActionResult Latest()
+    {
+        _logger.LogInformation("Latest value requested: {Latest}", _latest);
+        return Ok(new { latest = _latest });
+    }
 
     [HttpGet("/fllws/{username}")]
     public IActionResult Follows(string username, [FromHeader] string authorization,
         [FromQuery] int? latest, [FromQuery] int? no)
     {
         if (!IsAuthorized(authorization))
+        {
+            _logger.LogWarning("Unauthorized request for follows of user {Username}", username);
             return StatusCode(403, Forbidden);
+        }
 
         var user = _service.GetAuthorByName(username);
-        if (user == null) return NotFound();
+        if (user == null)
+        {
+            _logger.LogWarning("Follows requested for unknown user {Username}", username);
+            return NotFound();
+        }
 
         UpdateLatest(latest);
 
@@ -69,6 +80,7 @@ public class Controller : ControllerBase
             .Select(f => _context.Authors.FirstOrDefault(a => a.Id == f.FollowedId)!.UserName)
             .ToList();
 
+        _logger.LogInformation("Fetched {Count} follows for user {Username}", follows.Count, username);
         return Ok(new { follows });
     }
 
@@ -77,25 +89,43 @@ public class Controller : ControllerBase
         [FromQuery] int? latest, [FromBody] FollowRequest request)
     {
         if (!IsAuthorized(authorization))
+        {
+            _logger.LogWarning("Unauthorized follow/unfollow request for user {Username}", username);
             return StatusCode(403, Forbidden);
+        }
 
         var follower = _service.GetAuthorByName(username);
-        if (follower == null) return NotFound();
+        if (follower == null)
+        {
+            _logger.LogWarning("Follow/unfollow failed: user {Username} not found", username);
+            return NotFound();
+        }
 
         if (request.Follow != null)
         {
             var followed = _service.GetAuthorByName(request.Follow);
-            if (followed == null) return NotFound();
+            if (followed == null)
+            {
+                _logger.LogWarning("Follow failed: target user {Target} not found", request.Follow);
+                return NotFound();
+            }
             _service.Follow(follower, followed);
+            _logger.LogInformation("User {Username} followed {Target}", username, request.Follow);
         }
         else if (request.Unfollow != null)
         {
             var unfollowed = _service.GetAuthorByName(request.Unfollow);
-            if (unfollowed == null) return NotFound();
+            if (unfollowed == null)
+            {
+                _logger.LogWarning("Unfollow failed: target user {Target} not found", request.Unfollow);
+                return NotFound();
+            }
             _service.Unfollow(follower, unfollowed);
+            _logger.LogInformation("User {Username} unfollowed {Target}", username, request.Unfollow);
         }
         else
         {
+            _logger.LogWarning("Follow/unfollow request from {Username} had neither follow nor unfollow field", username);
             return BadRequest(new { status = 400, error_msg = "Request must contain either 'follow' or 'unfollow'" });
         }
 
@@ -263,6 +293,7 @@ public class Controller : ControllerBase
         }
 
         var errorMsg = string.Join("; ", result.Errors.Select(e => e.Description));
+        _logger.LogWarning("Registration failed for {Username}: {Errors}", credentials.Username, errorMsg);
         return BadRequest(new { status = 400, error_msg = errorMsg });
     }
 }
