@@ -20,11 +20,12 @@ public class Controller : ControllerBase
     private readonly UserManager<Author> _userManager;
     private readonly IUserStore<Author> _userStore;
     private readonly IUserEmailStore<Author> _emailStore;
+    private readonly ILogger<Controller> _logger;
 
     private static int _latest = 0;
 
     public Controller(ChirpDBContext context, IServiceProvider provider, ICheepService service,
-        UserManager<Author> userManager, IUserStore<Author> userStore)
+        UserManager<Author> userManager, IUserStore<Author> userStore, ILogger<Controller> logger)
     {
         _context = context;
         _provider = provider;
@@ -32,6 +33,7 @@ public class Controller : ControllerBase
         _userManager = userManager;
         _userStore = userStore;
         _emailStore = (IUserEmailStore<Author>)_userStore;
+        _logger = logger;
     }
 
     private static readonly object Forbidden =

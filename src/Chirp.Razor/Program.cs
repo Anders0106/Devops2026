@@ -35,7 +35,7 @@ builder.Services.AddDefaultIdentity<Author>(options =>
 
 builder.Services.Configure<PasswordHasherOptions>(options => options.IterationCount = 1000);
 
-
+builder.Logging.AddConsole();
 builder.Services.AddRazorPages();
 builder.Services.AddControllersWithViews();
 
