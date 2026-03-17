@@ -106,7 +106,7 @@ public class Controller : ControllerBase
             var followed = _service.GetAuthorByName(request.Follow);
             if (followed == null)
             {
-                _logger.LogWarning("Follow failed: target user {Target} not found", request.Follow);
+                _logger.LogWarning("Follow failed: {Username} tried to follow {Target}, but {Target} does not exist", username, request.Follow);
                 return NotFound();
             }
             _service.Follow(follower, followed);
@@ -117,7 +117,7 @@ public class Controller : ControllerBase
             var unfollowed = _service.GetAuthorByName(request.Unfollow);
             if (unfollowed == null)
             {
-                _logger.LogWarning("Unfollow failed: target user {Target} not found", request.Unfollow);
+                _logger.LogWarning("Unfollow failed: {Username} tried to unfollow {Target}, but {Target} does not exist", username, request.Unfollow);
                 return NotFound();
             }
             _service.Unfollow(follower, unfollowed);
@@ -225,7 +225,7 @@ public class Controller : ControllerBase
         var author = _service.GetAuthorByName(username);
         if (author == null)
         {
-            _logger.LogWarning("Post new cheep failed, because user {Username} does not exist", username);
+            _logger.LogWarning("Post new cheep failed, because user {Username} does not exist. Dropped content: \"{Content}\"", username, request.Content);
             return NotFound();
         }
 
