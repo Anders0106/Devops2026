@@ -144,10 +144,17 @@ public class Controller : ControllerBase
         [FromQuery] int? no)
     {
         if (!IsAuthorized(authorization))
+        {
+            _logger.LogWarning("Unauthorized request for messages of user {Username}", username);  
             return StatusCode(403, Forbidden);
-
+        }
+        
         var user = _service.GetAuthorByName(username);
-        if (user == null) return NotFound();
+        if (user == null)
+        {
+            _logger.LogWarning("Messages requested for unknown user {Username}", username);
+            return NotFound();
+        }
 
         UpdateLatest(latest);
 
@@ -157,6 +164,7 @@ public class Controller : ControllerBase
             .OrderByDescending(c => c.TimeStamp)
             .Take(no ?? 100)
             .ToList();
+        _logger.LogInformation("Fetched {Count} messages for user {Username}", cheeps.Count, username);
 
         return Ok(cheeps.Select(c => new
         {
@@ -174,10 +182,17 @@ public class Controller : ControllerBase
         [FromBody] MessageRequest request)
     {
         if (!IsAuthorized(authorization))
+        {
+            _logger.LogWarning("Unauthorized request to create a cheep by user {Username}", username);
             return StatusCode(403, Forbidden);
+        }
 
         var author = _service.GetAuthorByName(username);
-        if (author == null) return NotFound();
+        if (author == null)
+        {
+            _logger.LogWarning("Post new cheep failed, because user {Username} does not exist", username);
+            return NotFound();
+        }
 
         UpdateLatest(latest);
 
