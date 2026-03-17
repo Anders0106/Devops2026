@@ -102,12 +102,14 @@ namespace Chirp.Razor.Areas.Identity.Pages.Account
 			returnUrl = returnUrl ?? Url.Content("~/");
 			if (remoteError != null)
 			{
+				_logger.LogError("External login error from provider: {RemoteError}", remoteError);
 				ErrorMessage = $"Error from external provider: {remoteError}";
 				return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
 			}
 			var info = await _signInManager.GetExternalLoginInfoAsync();
 			if (info == null)
 			{
+				_logger.LogError("Failed to load external login info after OAuth callback");
 				ErrorMessage = "Error loading external login information.";
 				return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
 			}
@@ -190,6 +192,8 @@ namespace Chirp.Razor.Areas.Identity.Pages.Account
 						return LocalRedirect(returnUrl);
 					}
 				}
+				var errorMsg = string.Join("; ", result.Errors.Select(e => e.Description));
+				_logger.LogWarning("External login account creation failed for {Username}: {Errors}", Input.UserName, errorMsg);
 				foreach (var error in result.Errors)
 				{
 					ModelState.AddModelError(string.Empty, error.Description);

@@ -5,7 +5,7 @@ namespace Chirp.Razor.Pages;
 
 public class MyTimelineModel : Model
 {
-	public MyTimelineModel(ICheepService service) : base(service) { }
+	public MyTimelineModel(ICheepService service, ILoggerFactory loggerFactory) : base(service, loggerFactory) { }
 
 	public ActionResult OnGet([FromQuery] int page, string? author)
 	{
@@ -19,6 +19,7 @@ public class MyTimelineModel : Model
 		if (!string.IsNullOrEmpty(author))
 			PaginateCheepsByFollowers(page, author);
 
+		_logger.LogInformation("My timeline loaded for {Username}, page {Page}", author, page);
 		return Page();
 	}
 

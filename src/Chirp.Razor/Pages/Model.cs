@@ -2,6 +2,7 @@ using Chirp.Core.DTO;
 using Chirp.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 namespace Chirp.Razor.Pages;
@@ -17,6 +18,7 @@ public class Model : PageModel
 	public List<IFormFile> UploadedImages { get; set; } = [];
 
 	protected readonly ICheepService _service;
+	protected readonly ILogger _logger;
 
 	public int PageNumber { get; set; }
 	public int TotalPages { get; set; }
@@ -26,9 +28,10 @@ public class Model : PageModel
 	public AuthorDTO? UserAuthor { get; set; }
 	public List<AuthorDTO> FollowedAuthors { get; set; } = [];
 
-	public Model(ICheepService service)
+	public Model(ICheepService service, ILoggerFactory loggerFactory)
 	{
 		_service = service;
+		_logger = loggerFactory.CreateLogger(GetType().Name);
 	}
 
 	//Ideally querying slices instead of taking the whole thing.
@@ -56,7 +59,7 @@ public class Model : PageModel
 		var currentUser = _service.GetAuthorByName(User.Identity.Name);
 		if (userToFollow == null || currentUser == null) return RedirectToPage();
 		_service.Follow(currentUser, userToFollow);
-		Console.WriteLine("Follow might have been a success");
+		_logger.LogInformation("User {Follower} followed {Followed}", User.Identity.Name, followed);
 		return RedirectToPage();
 	}
 
@@ -69,7 +72,7 @@ public class Model : PageModel
 		var currentUser = _service.GetAuthorByName(User.Identity.Name);
 		if (userToUnfollow == null || currentUser == null) return RedirectToPage();
 		_service.Unfollow(currentUser, userToUnfollow);
-		Console.WriteLine("Unfollow might have been a success");
+		_logger.LogInformation("User {Follower} unfollowed {Unfollowed}", User.Identity.Name, unfollowed);
 		return RedirectToPage();
 	}
 
@@ -142,6 +145,7 @@ public class Model : PageModel
 					}
 					var url = "/images/" + fileName;
 					imageUrls.Add(url);
+					_logger.LogInformation("Image uploaded for user {Username}: {FileName}", User.Identity.Name, fileName);
 				}
 			}
 		}
@@ -157,6 +161,7 @@ public class Model : PageModel
 
 		_service.CreateCheep(cheep);
 		ChirpMetrics.CheepsCreated.Inc();
+		_logger.LogInformation("Cheep created by {Username}, length {Length}", User.Identity.Name, Message.Length);
 
 		return RedirectToPage();
 	}
@@ -191,6 +196,7 @@ public class Model : PageModel
 
 		_service.AddComment(comment);
 		ChirpMetrics.CommentsAdded.Inc();
+		_logger.LogInformation("Comment added by {Username} on cheep {CheepId}", User.Identity.Name, cheepId);
 
 		return RedirectToPage();
 	}
@@ -210,6 +216,7 @@ public class Model : PageModel
 		}
 
 		_service.DeleteComment(commentId);
+		_logger.LogInformation("Comment {CommentId} deleted by {Username}", commentId, User.Identity.Name);
 
 		return RedirectToPage();
 	}
@@ -245,10 +252,12 @@ public class Model : PageModel
 		var cheep = _service.GetCheepByID(cheepId);
 		if (cheep == null || cheep.Author.UserName != User.Identity.Name)
 		{
+			_logger.LogWarning("Unauthorized cheep delete attempt by {Username} for cheep {CheepId}", User.Identity.Name, cheepId);
 			return RedirectToPage("/Error");
 		}
 
 		_service.DeleteCheep(cheepId);
+		_logger.LogInformation("Cheep {CheepId} deleted by {Username}", cheepId, User.Identity.Name);
 
 		return RedirectToPage();
 	}

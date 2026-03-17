@@ -15,7 +15,8 @@ namespace Chirp.Razor.Areas.Identity.Pages.Account.Manage
 		public PersonalDataModel(
 			UserManager<Author> userManager,
 			ILogger<PersonalDataModel> logger,
-			ICheepService service) : base(service)
+			ICheepService service,
+			ILoggerFactory loggerFactory) : base(service, loggerFactory)
 		{
 			_userManager = userManager;
 			_logger = logger;
@@ -26,6 +27,7 @@ namespace Chirp.Razor.Areas.Identity.Pages.Account.Manage
 			var user = await _userManager.GetUserAsync(User);
 			if (user == null)
 			{
+				_logger.LogWarning("Personal data page: could not load user with ID {UserId}", _userManager.GetUserId(User));
 				return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
 			}
 			if (page < 1) page = 1;
