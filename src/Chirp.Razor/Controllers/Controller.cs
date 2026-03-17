@@ -190,6 +190,7 @@ public class Controller : ControllerBase
 
         _service.CreateCheep(cheep);
         Chirp.Razor.ChirpMetrics.CheepsCreated.Inc();
+        _logger.LogInformation("New cheep message of length {messageLength} was created by {username}", request.Content.Length, username);
         return NoContent();
     }
 
