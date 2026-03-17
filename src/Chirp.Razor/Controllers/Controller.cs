@@ -219,10 +219,15 @@ public class Controller : ControllerBase
     public async Task<IActionResult> Register([FromBody] RegisterRequest credentials, [FromQuery] int? latest)
     {
         if (!ModelState.IsValid)
+        {
             return BadRequest(new { status = 400, error_msg = "Invalid request body" });
-
+        }
+        
         if (await _userManager.FindByNameAsync(credentials.Username) != null)
+        {
+            _logger.LogWarning("Registration failed: Username already exists: {Username}", credentials.Username);
             return BadRequest(new { status = 400, error_msg = "Username already exists" });
+        }
 
         var user = Activator.CreateInstance<Author>();
         await _userStore.SetUserNameAsync(user, credentials.Username, CancellationToken.None);
@@ -232,7 +237,10 @@ public class Controller : ControllerBase
         UpdateLatest(latest);
 
         if (result.Succeeded)
+        {
+            _logger.LogInformation("User successfully registered: {Username}", credentials.Username);
             return StatusCode(StatusCodes.Status204NoContent);
+        }
 
         var errorMsg = string.Join("; ", result.Errors.Select(e => e.Description));
         return BadRequest(new { status = 400, error_msg = errorMsg });
