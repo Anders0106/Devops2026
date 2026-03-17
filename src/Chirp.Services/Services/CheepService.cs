@@ -2,17 +2,19 @@
 using Chirp.Core.DTO;
 using Chirp.Repositories.Interfaces;
 using Chirp.Services.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Chirp.Services
 {
 	public class CheepService : ICheepService
 	{
 		private readonly ICheepRepository _repository;
+		private readonly ILogger<CheepService>? _logger;
 
-
-		public CheepService(ICheepRepository repository)
+		public CheepService(ICheepRepository repository, ILogger<CheepService>? logger = null)
 		{
 			_repository = repository;
+			_logger = logger;
 		}
 		
 		/// <summary>
@@ -57,7 +59,9 @@ namespace Chirp.Services
 		/// </exception>
 		public int CreateCheep(CheepDTO newCheep)
 		{
-			return _repository.CreateCheep(newCheep);
+			var id = _repository.CreateCheep(newCheep);
+			_logger?.LogInformation("Cheep {CheepId} created by author {AuthorId}", id, newCheep.Author.Id);
+			return id;
 		}
 		
 		/// <summary>
@@ -101,6 +105,7 @@ namespace Chirp.Services
 		public void Follow(AuthorDTO followerAuthor, AuthorDTO followedAuthor)
 		{
 			_repository.Follow(followerAuthor, followedAuthor);
+			_logger?.LogInformation("Author {FollowerId} followed {FollowedId}", followerAuthor.Id, followedAuthor.Id);
 		}
 
 		/// <summary>
@@ -112,6 +117,7 @@ namespace Chirp.Services
 		public void Unfollow(AuthorDTO followerAuthor, AuthorDTO followedAuthor)
 		{
 			_repository.Unfollow(followerAuthor, followedAuthor);
+			_logger?.LogInformation("Author {FollowerId} unfollowed {FollowedId}", followerAuthor.Id, followedAuthor.Id);
 		}
 
 		/// <summary>
@@ -203,6 +209,7 @@ namespace Chirp.Services
 		public void UpdateCheep(CheepDTO newCheep, int cheepID)
 		{
 			_repository.UpdateCheep(newCheep, cheepID);
+			_logger?.LogInformation("Cheep {CheepId} updated", cheepID);
 		}
 
 		/// <summary>
@@ -212,6 +219,7 @@ namespace Chirp.Services
 		public void DeleteCheep(int cheepId)
 		{
 			_repository.DeleteCheep(cheepId);
+			_logger?.LogInformation("Cheep {CheepId} deleted", cheepId);
 		}
 		
 		/// <summary>
@@ -253,6 +261,7 @@ namespace Chirp.Services
 		public void AddComment(CommentDTO comment)
 		{
 			_repository.AddComment(comment);
+			_logger?.LogInformation("Comment added by author {AuthorId} on cheep {CheepId}", comment.Author.Id, comment.CheepId);
 		}
 		
 		/// <summary>
@@ -262,6 +271,7 @@ namespace Chirp.Services
 		public void DeleteComment(int commentId)
 		{
 			_repository.DeleteComment(commentId);
+			_logger?.LogInformation("Comment {CommentId} deleted", commentId);
 		}
 	}
 }

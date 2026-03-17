@@ -143,6 +143,8 @@ namespace Chirp.Razor.Areas.Identity.Pages.Account
 						return LocalRedirect(returnUrl);
 					}
 				}
+				var errorMsg = string.Join("; ", result.Errors.Select(e => e.Description));
+				_logger.LogWarning("Registration failed for {Username}: {Errors}", Input.UserName, errorMsg);
 				foreach (var error in result.Errors)
 				{
 					ModelState.AddModelError(string.Empty, error.Description);

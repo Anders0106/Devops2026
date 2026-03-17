@@ -5,20 +5,23 @@ using Chirp.Core.DTO;
 using Chirp.Repositories.Helpers;
 using Chirp.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 /// <summary>
 /// Repository class for managing Cheep entities in the database.
 /// </summary>
 public class CheepRepository : ICheepRepository
 {
 	private readonly ChirpDBContext _dbContext;
-	
+	private readonly ILogger<CheepRepository>? _logger;
+
 	/// <summary>
 	/// Initializes a new instance of the <see cref="CheepRepository"/> class.
 	/// </summary>
 	/// <param name="dBContext">The database context to be used by the repository.</param>
-	public CheepRepository(ChirpDBContext dBContext)
+	public CheepRepository(ChirpDBContext dBContext, ILogger<CheepRepository>? logger = null)
 	{
 		_dbContext = dBContext;
+		_logger = logger;
 	}
 	
 	/// <summary>
@@ -55,6 +58,7 @@ public class CheepRepository : ICheepRepository
 		foundAuthor.Cheeps.Add(cheep);
 
 		_dbContext.SaveChanges();
+		_logger?.LogInformation("Cheep {CheepId} created by author {AuthorId}", cheep.CheepId, foundAuthor.Id);
 		return cheep.CheepId;
 	}
 	
@@ -211,7 +215,7 @@ public class CheepRepository : ICheepRepository
 
 		if (existingFollow != null)
 		{
-			Console.WriteLine($"Follow relationship already exists: {followerAuthor.Id} -> {followedAuthor.Id}");
+			_logger?.LogInformation("Follow relationship already exists: {FollowerId} -> {FollowedId}", followerAuthor.Id, followedAuthor.Id);
 			return;
 		}
 
@@ -225,6 +229,7 @@ public class CheepRepository : ICheepRepository
 
 		_dbContext.Follows.Add(followEntry);
 		_dbContext.SaveChanges();
+		_logger?.LogInformation("Author {FollowerId} followed {FollowedId}", followerAuthor.Id, followedAuthor.Id);
 	}
 	
 	/// <summary>
@@ -240,11 +245,13 @@ public class CheepRepository : ICheepRepository
 
 		if (followEntry == null)
 		{
+			_logger?.LogWarning("Unfollow failed: no follow relationship from {FollowerId} to {FollowedId}", followerAuthor.Id, followedAuthor.Id);
 			throw new ArgumentException("Follow relationship does not exist.");
 		}
 
 		_dbContext.Follows.Remove(followEntry);
 		_dbContext.SaveChanges();
+		_logger?.LogInformation("Author {FollowerId} unfollowed {FollowedId}", followerAuthor.Id, followedAuthor.Id);
 	}
 
 	/// <summary>
@@ -290,6 +297,11 @@ public class CheepRepository : ICheepRepository
 		{
 			_dbContext.Cheeps.Remove(cheep);
 			_dbContext.SaveChanges();
+			_logger?.LogInformation("Cheep {CheepId} deleted", cheepID);
+		}
+		else
+		{
+			_logger?.LogWarning("DeleteCheep called for non-existent cheep {CheepId}", cheepID);
 		}
 	}
 	
@@ -351,6 +363,7 @@ public class CheepRepository : ICheepRepository
 	{
 		_dbContext.Authors.Add(ToDomain(newAuthor));
 		_dbContext.SaveChanges();
+		_logger?.LogInformation("Author {AuthorId} ({Username}) created", newAuthor.Id, newAuthor.UserName);
 	}
 	
 	/// <summary>
@@ -365,6 +378,11 @@ public class CheepRepository : ICheepRepository
 		{
 			cheep.Text = newCheep.Text;
 			_dbContext.SaveChanges();
+			_logger?.LogInformation("Cheep {CheepId} updated", cheepID);
+		}
+		else
+		{
+			_logger?.LogWarning("UpdateCheep called for non-existent cheep {CheepId}", cheepID);
 		}
 	}
 	
@@ -425,6 +443,7 @@ public class CheepRepository : ICheepRepository
 
 		_dbContext.Comments.Add(newComment);
 		_dbContext.SaveChanges();
+		_logger?.LogInformation("Comment added by author {AuthorId} on cheep {CheepId}", trackedAuthor.Id, cheep.CheepId);
 	}
 
 	/// <summary>
@@ -438,6 +457,11 @@ public class CheepRepository : ICheepRepository
 		{
 			_dbContext.Comments.Remove(comment);
 			_dbContext.SaveChanges();
+			_logger?.LogInformation("Comment {CommentId} deleted", commentId);
+		}
+		else
+		{
+			_logger?.LogWarning("DeleteComment called for non-existent comment {CommentId}", commentId);
 		}
 	}
 }

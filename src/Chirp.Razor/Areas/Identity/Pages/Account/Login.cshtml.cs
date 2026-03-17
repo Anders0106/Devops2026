@@ -135,6 +135,7 @@ namespace Chirp.Razor.Areas.Identity.Pages.Account
 				}
 				else
 				{
+					_logger.LogWarning("Failed login attempt for {EmailOrUsername}", Input.EmailOrUsername);
 					ModelState.AddModelError(string.Empty, "Invalid login attempt.");
 					return Page();
 				}
