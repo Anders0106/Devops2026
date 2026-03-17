@@ -30,7 +30,7 @@ public class RequestTimingMiddleware
         if (stopwatch.Elapsed > _slowThreshold)
         {
             _logger.LogWarning(
-                "Slow request detected: {Method} {Path} took {ElapsedMilliseconds} ms",
+                "Request completed: IP = {IP}, Method = {Method}, Path = {Path}, took {ElapsedMilliseconds} ms",
                 ipAddress,
                 context.Request.Method,
                 context.Request.Path,
@@ -39,7 +39,7 @@ public class RequestTimingMiddleware
         else 
         {
             _logger.LogInformation(
-                "Request completed: {Method} {Path} took {ElapsedMilliseconds} ms",
+                "Request completed: IP = {IP}, Method = {Method}, Path = {Path}, took {ElapsedMilliseconds} ms",
                 ipAddress,
                 context.Request.Method,
                 context.Request.Path,
