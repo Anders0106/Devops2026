@@ -22,6 +22,7 @@ services:
 
   chirp-web:
     image: ghcr.io/anders0106/devops2026:latest
+    user: "1000:1000"
     depends_on:
       - db
     environment:
