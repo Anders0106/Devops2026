@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run Semgrep security scan
-        run: semgrep scan --config=p/csharp --config=p/owasp-top-ten --error src/
+        run: semgrep scan --config=p/csharp --config=p/owasp-top-ten --config=p/dockerfile --error .
 
   test:
     needs: [semgrep]
