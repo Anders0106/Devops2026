@@ -2,7 +2,17 @@ name: CI
 on: [push, pull_request]
 
 jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Semgrep security scan
+        run: semgrep scan --config=p/csharp --config=p/owasp-top-ten --error src/
+
   test:
+    needs: [semgrep]
     runs-on: ubuntu-latest
 
     services:
