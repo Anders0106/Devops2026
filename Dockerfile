@@ -23,12 +23,13 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 
 WORKDIR /app
 
-# Create Assets directory
-RUN mkdir -p /app/Assets
+# Create Assets directory and set ownership for non-root user
+RUN mkdir -p /app/Assets && chown -R app:app /app
 
 # Copy the published output from the build stage
 COPY --from=build /app/publish .
 
 EXPOSE 80
 
+USER app
 ENTRYPOINT ["dotnet", "Chirp.Razor.dll"]
