@@ -8,7 +8,7 @@ services:
     depends_on:
       - db
     ports:
-      - "8080:80"
+      - "127.0.0.1:8080:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:80
@@ -85,7 +85,7 @@ services:
       - --storage.tsdb.path=/prometheus
       - --web.enable-lifecycle
     ports:
-      - "9090:9090"
+      - "127.0.0.1:9090:9090"
     configs:
       - source: prometheus_config
         target: /etc/prometheus/prometheus.yml
@@ -101,7 +101,7 @@ services:
     user: "0"
     command: -config.file=/etc/loki/loki-config.yaml
     ports:
-      - "3100:3100"
+      - "127.0.0.1:3100:3100"
     configs:
       - source: loki_config
         target: /etc/loki/loki-config.yaml
@@ -140,7 +140,7 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_SERVER_HTTP_PORT=3000
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     configs:
       - source: grafana_datasources
         target: /etc/grafana/provisioning/datasources/datasources.yml
