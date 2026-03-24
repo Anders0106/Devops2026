@@ -3,12 +3,27 @@
 # Requires: docker swarm init (if not already initialized)
 
 services:
+  caddy:
+    image: caddy:2-alpine
+    depends_on:
+      - chirp-web
+    ports:
+      - "127.0.0.1:8080:80"
+    configs:
+      - source: caddyfile
+        target: /etc/caddy/Caddyfile
+    volumes:
+      - caddy-data:/data
+      - caddy-config:/config
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
   chirp-web:
     image: ghcr.io/anders0106/devops2026:latest
     depends_on:
       - db
-    ports:
-      - "127.0.0.1:8080:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:80
@@ -153,6 +168,8 @@ services:
         condition: on-failure
 
 configs:
+  caddyfile:
+    file: ./Caddyfile
   prometheus_config:
     file: ./monitoring/prometheus.yml
   grafana_datasources:
@@ -163,6 +180,8 @@ configs:
     file: ./monitoring/promtail-config.yaml
 
 volumes:
+  caddy-data:
+  caddy-config:
   chirp-data:
   chirp-db:
   prometheus-data:

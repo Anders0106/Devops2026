@@ -1,0 +1,3 @@
+:80 {
+	reverse_proxy chirp-web:80
+}
