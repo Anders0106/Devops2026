@@ -1,3 +1,5 @@
 :80 {
-	reverse_proxy chirp-web:80
+	reverse_proxy chirp-web:80 {
+		lb_policy ip_hash
+	}
 }
