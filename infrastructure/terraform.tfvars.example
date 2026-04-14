@@ -1,0 +1,11 @@
+# Copy this file to terraform.tfvars and fill in your values.
+# NEVER commit terraform.tfvars — it contains secrets.
+
+do_token            = "dop_v1_..."
+region              = "fra1"
+droplet_size        = "s-2vcpu-4gb"
+ssh_public_key_path = "~/.ssh/id_ed25519.pub"
+deploy_user         = "deploy"
+github_image_repo   = "ghcr.io/anders0106/devops2026"
+grafana_admin_password = "changeme"
+db_password            = "changeme"
