@@ -17,9 +17,9 @@ top10_cheeps:
     SELECT
         u."UserName",
         u."Id",
-        COUNT(c."Id") AS value
+        COUNT(c."CheepId") AS value
     FROM "AspNetUsers" u
-    LEFT JOIN "Cheeps" c ON c."UserId" = u."Id"
+    LEFT JOIN "Cheeps" c ON c."AuthorId" = u."Id"
     GROUP BY u."Id", u."UserName"
     ORDER BY value DESC
     LIMIT 10
