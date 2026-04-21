@@ -1,11 +1,13 @@
 chirp_users_total:
-  query: "SELECT COUNT(*) AS value FROM AspNetUsers"
+  query: |
+    SELECT COUNT(*) AS value FROM "AspNetUsers"
   metrics:
     - value:
         usage: "GAUGE"
 
 chirp_cheeps:
-  query: "SELECT COUNT(*) AS value FROM Cheeps"
+  query: |
+    SELECT COUNT(*) AS value FROM "Cheeps"
   metrics:
     - value:
         usage: "GAUGE"
