@@ -5,7 +5,7 @@
   "graphTooltip": 1,
   "links": [],
   "liveNow": false,
-  "panels": [
+"panels": [
     {
       "collapsed": false,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
@@ -14,13 +14,14 @@
       "title": "Overview",
       "type": "row"
     },
+
     {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
         "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] } },
         "overrides": []
       },
-      "gridPos": { "h": 3, "w": 4, "x": 0, "y": 1 },
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 1 },
       "id": 2,
       "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
       "pluginVersion": "11.2.0",
@@ -31,40 +32,125 @@
     {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
-        "defaults": { "color": { "mode": "palette-classic" }, "unit": "short" },
+        "defaults": {
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "green"
+          },
+          "unit": "none"
+        },
         "overrides": []
       },
-      "gridPos": { "h": 6, "w": 6, "x": 4, "y": 1 },
-      "id": 3,
-      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true } },
-      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum by (datname) (pg_stat_database_numbackends)", "legendFormat": "{{datname}}", "refId": "A" }],
-      "title": "Active Connections",
-      "type": "timeseries"
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 1 },
+      "id": 999,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "chirp_users_total_value",
+          "refId": "A"
+        }
+      ],
+      "title": "Total Users",
+      "type": "stat"
     },
     {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
-        "defaults": { "color": { "mode": "palette-classic" }, "unit": "short" },
+        "defaults": {
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "green"
+          },
+          "unit": "none"
+        },
         "overrides": []
       },
-      "gridPos": { "h": 6, "w": 6, "x": 10, "y": 1 },
-      "id": 4,
-      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true } },
-      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "rate(pg_stat_database_xact_commit{datname=\"chirp\"}[5m])", "legendFormat": "Commits", "refId": "A" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "rate(pg_stat_database_xact_rollback{datname=\"chirp\"}[5m])", "legendFormat": "Rollbacks", "refId": "B" }],
-      "title": "Transactions (chirp)",
-      "type": "timeseries"
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 1 },
+      "id": 1000,
+      "options": {
+        "colorMode": "value",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"]
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "chirp_cheeps_value",
+          "refId": "A"
+        }
+      ],
+      "title": "Total Cheeps",
+      "type": "stat"
     },
+
     {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
         "defaults": { "color": { "mode": "thresholds" }, "max": 1, "min": 0, "unit": "percentunit" },
         "overrides": []
       },
-      "gridPos": { "h": 6, "w": 6, "x": 16, "y": 1 },
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 1 },
       "id": 5,
       "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true } },
-      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(pg_stat_database_blks_hit{datname=\"chirp\"}) / (sum(pg_stat_database_blks_hit{datname=\"chirp\"}) + sum(pg_stat_database_blks_read{datname=\"chirp\"}))", "legendFormat": "Cache hit ratio", "refId": "A" }],
+      "targets": [{
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "expr": "sum(pg_stat_database_blks_hit{datname=\"chirp\"}) / (sum(pg_stat_database_blks_hit{datname=\"chirp\"}) + sum(pg_stat_database_blks_read{datname=\"chirp\"}))",
+        "legendFormat": "Cache hit ratio",
+        "refId": "A"
+      }],
       "title": "Cache Hit Ratio",
+      "type": "timeseries"
+    },
+
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 4 },
+      "id": 10,
+      "panels": [],
+      "title": "Database",
+      "type": "row"
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "unit": "short" },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 5 },
+      "id": 3,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum by (datname) (pg_stat_database_numbackends)", "legendFormat": "{{datname}}", "refId": "A" }],
+      "title": "Active Connections",
+      "type": "timeseries"
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "unit": "short" },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 5 },
+      "id": 4,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true } },
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "rate(pg_stat_database_xact_commit{datname=\"chirp\"}[5m])", "legendFormat": "Commits", "refId": "A" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "rate(pg_stat_database_xact_rollback{datname=\"chirp\"}[5m])", "legendFormat": "Rollbacks", "refId": "B" }
+      ],
+      "title": "Transactions (chirp)",
       "type": "timeseries"
     },
     {
@@ -73,72 +159,12 @@
         "defaults": { "color": { "mode": "palette-classic" }, "unit": "bytes" },
         "overrides": []
       },
-      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 7 },
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 5 },
       "id": 6,
       "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true } },
       "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "pg_database_size_bytes{datname=\"chirp\"}", "legendFormat": "chirp DB size", "refId": "A" }],
       "title": "Database Size",
       "type": "timeseries"
-    },
-        {
-    "datasource": { "type": "prometheus", "uid": "prometheus" },
-    "fieldConfig": {
-        "defaults": {
-        "color": { "mode": "thresholds" },
-        "thresholds": {
-            "mode": "absolute",
-            "steps": [
-            { "color": "red", "value": null },
-            { "color": "green", "value": 1 }
-            ]
-        },
-        "unit": "none"
-        },
-        "overrides": []
-    },
-    "gridPos": { "h": 3, "w": 4, "x": 0, "y": 1 },
-    "id": 999,
-    "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "reduceOptions": {
-        "calcs": ["lastNotNull"],
-        "fields": "",
-        "values": false
-        },
-        "textMode": "auto"
-    },
-    "targets": [
-        {
-        "datasource": { "type": "prometheus", "uid": "prometheus" },
-        "expr": "chirp_users_total_value",
-        "refId": "A"
-        }
-    ],
-    "title": "Total Users",
-    "type": "stat"
-    },
-    {
-    "datasource": { "type": "prometheus", "uid": "prometheus" },
-    "fieldConfig": {
-        "defaults": { "unit": "none" }
-    },
-    "gridPos": { "h": 3, "w": 4, "x": 4, "y": 1 },
-    "id": 1000,
-    "options": {
-        "colorMode": "value",
-        "reduceOptions": { "calcs": ["lastNotNull"] },
-        "textMode": "auto"
-    },
-    "targets": [
-        {
-        "expr": "chirp_cheeps_value",
-        "refId": "A"
-        }
-    ],
-    "title": "Total Cheeps",
-    "type": "stat"
     }
   ],
   "refresh": "10s",
