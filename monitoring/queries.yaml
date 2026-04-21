@@ -11,22 +11,3 @@ chirp_cheeps:
   metrics:
     - value:
         usage: "GAUGE"
-
-top10_cheeps:
-  query: |
-    SELECT
-        u."UserName",
-        u."Id",
-        COUNT(c."CheepId") AS value
-    FROM "AspNetUsers" u
-    LEFT JOIN "Cheeps" c ON c."AuthorId" = u."Id"
-    GROUP BY u."Id", u."UserName"
-    ORDER BY value DESC
-    LIMIT 10
-  metrics:
-    - UserName:
-        usage: "LABEL"
-    - Id:
-        usage: "LABEL"
-    - value:
-        usage: "GAUGE"
