@@ -72,6 +72,9 @@ services:
       - DATA_SOURCE_URI=db:5432/chirp?sslmode=disable
       - DATA_SOURCE_USER=postgres
       - DATA_SOURCE_PASS=postgres
+      - PG_EXPORTER_EXTEND_QUERY_PATH=/etc/postgres_exporter/queries.yaml
+    volumes:
+      - ./monitoring/queries.yaml:/etc/postgres_exporter/queries.yaml:ro
     depends_on:
       - db
     deploy:

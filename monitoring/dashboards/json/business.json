@@ -1,0 +1,81 @@
+{
+  "title": "Business Metrics",
+  "uid": "business",
+  "panels": [
+    {
+    "datasource": { "type": "prometheus", "uid": "prometheus" },
+    "fieldConfig": {
+        "defaults": {
+        "color": { "mode": "thresholds" },
+        "thresholds": {
+            "mode": "absolute",
+            "steps": [
+            { "color": "red", "value": null },
+            { "color": "green", "value": 1 }
+            ]
+        },
+        "unit": "none"
+        },
+        "overrides": []
+    },
+    "gridPos": { "h": 3, "w": 4, "x": 0, "y": 1 },
+    "id": 999,
+    "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "reduceOptions": {
+        "calcs": ["lastNotNull"],
+        "fields": "",
+        "values": false
+        },
+        "textMode": "auto"
+    },
+    "targets": [
+        {
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "expr": "chirp_users_total_value",
+        "refId": "A"
+        }
+    ],
+    "title": "Total Users",
+    "type": "stat"
+    },
+    {
+    "datasource": { "type": "prometheus", "uid": "prometheus" },
+    "fieldConfig": {
+        "defaults": { "unit": "none" }
+    },
+    "gridPos": { "h": 3, "w": 4, "x": 4, "y": 1 },
+    "id": 1000,
+    "options": {
+        "colorMode": "value",
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "textMode": "auto"
+    },
+    "targets": [
+        {
+        "expr": "chirp_cheeps_value",
+        "refId": "A"
+        }
+    ],
+    "title": "Total Cheeps",
+    "type": "stat"
+    },
+    {
+    "datasource": { "type": "prometheus", "uid": "prometheus" },
+    "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+    "id": 1001,
+    "targets": [
+        {
+        "expr": "top10_cheeps_value",
+        "refId": "A"
+        }
+    ],
+    "title": "Top 10 Users (Cheeps)",
+    "type": "table"
+    }
+  ],
+  "schemaVersion": 39,
+  "version": 1
+}
