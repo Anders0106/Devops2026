@@ -51,7 +51,8 @@ ufw --force enable
 # ---------------------------------------------------------------------------
 # 5. Initialise Docker Swarm (single-node manager)
 # ---------------------------------------------------------------------------
-docker swarm init || true   # idempotent — exits 0 if already a manager
+PUBLIC_IP=$(curl -s http://169.254.169.254/metadata/v1/interfaces/public/0/ipv4/address)
+docker swarm init --advertise-addr "$PUBLIC_IP" || true
 
 # ---------------------------------------------------------------------------
 # 6. Write deployment artefacts under /opt/chirp
