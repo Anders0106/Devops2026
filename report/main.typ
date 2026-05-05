@@ -5,7 +5,7 @@
 
 #set document(
   title: "ITU-MiniTwit — Group X Report",
-  author: ("Member A", "Member B", "Member C", "Member D", "Member E"),
+  author: ("Member A", "Member B", "Member C", "Member D", "Phillip Nikolai Rasmussen"),
 )
 
 #set page(
@@ -54,7 +54,7 @@
     Member B \<id2\@itu.dk\> \
     Member C \<id3\@itu.dk\> \
     Member D \<id4\@itu.dk\> \
-    Member E \<id5\@itu.dk\>
+    Phillip Nikolai Rasmussesn \<phir\@itu.dk\>
   ] \
   #v(2em)
   #text(size: 11pt)[
