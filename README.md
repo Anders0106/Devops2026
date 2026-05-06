@@ -104,6 +104,9 @@ make test      # Run all tests
 make clean     # Clean build artifacts
 make restore   # Restore NuGet packages
 ```
+## CI/CD Pipeline in Action
+
+![CI/CD pipeline demo](report/images/cicd-demo.gif)
 
 ## Deployment
 

@@ -1,0 +1,49 @@
+@startuml deployment
+!theme plain
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 50
+
+actor "User\n(Browser)" as user
+
+node "DigitalOcean Droplet (Ubuntu 24.04)" as hetzner {
+  node "Docker Swarm" as swarm {
+    node "caddy:2-alpine" as caddy <<container>> {
+      component "Reverse Proxy\n(ip_hash)" as rp
+    }
+
+    node "chirp-web" as web <<container>> {
+      component "ASP.NET 8.0\nRazor Pages +\nAPI Controller" as app
+      component "Prometheus\n/metrics" as appmetrics
+    }
+
+    node "postgres:17-alpine" as dbnode <<container>> {
+      database "chirp" as db
+    }
+
+    node "postgres-exporter" as pgexp <<container>>
+
+    node "Observability" as obs {
+      node "prometheus" as prom <<container>>
+      node "grafana" as graf <<container>>
+      node "loki" as loki <<container>>
+      node "promtail" as promtail <<container>>
+    }
+
+    node "shepherd" as shepherd <<container>>
+  }
+}
+
+cloud "GHCR\nghcr.io" as ghcr
+
+user -down-> rp : HTTPS
+rp -down-> app : HTTP :80
+app -down-> db : TCP :5432
+pgexp -down-> db : TCP :5432
+prom -left-> appmetrics : scrape
+prom -down-> pgexp : scrape
+graf -right-> prom : query
+graf -right-> loki : query
+promtail -up-> loki : push logs
+shepherd -up-> ghcr : poll for\nnew images
+@enduml

@@ -1,0 +1,51 @@
+@startuml components
+!theme plain
+skinparam linetype ortho
+skinparam packageStyle rectangle
+
+package "Chirp.Razor" as razor <<.NET Project>> {
+  [Razor Pages\n(Public, UserTimeline,\nMyTimeline)] as pages
+  [API Controller\n(/msgs, /fllws, /register)] as ctrl
+  [ChirpMetrics\n(Prometheus counters)] as metrics
+}
+
+package "Chirp.Services" as services <<.NET Project>> {
+  interface "ICheepService" as isvc
+  [CheepService] as svc
+  isvc -- svc
+}
+
+package "Chirp.Repositories" as repos <<.NET Project>> {
+  interface "ICheepRepository" as irepo
+  [CheepRepository] as repo
+  [ChirpDBContext\n(EF Core)] as ctx
+  irepo -- repo
+  repo --> ctx
+}
+
+package "Chirp.Core" as core <<.NET Project>> {
+  [Author\n(IdentityUser)] as author
+  [Cheep] as cheep
+  [Follow] as follow
+  [Comment] as comment
+  [DTOs\n(CheepDTO, AuthorDTO)] as dto
+}
+
+database "PostgreSQL 17" as db
+
+pages -down-> isvc : uses
+ctrl -down-> isvc : uses
+ctrl -right-> metrics : increments
+svc -down-> irepo : uses
+ctx -down-> db : EF Core
+repo ..> author : maps
+repo ..> cheep : maps
+repo ..> follow : maps
+repo ..> comment : maps
+
+note bottom of core
+  No outward dependencies.
+  Defines the domain model and DTOs
+  shared by all other layers.
+end note
+@enduml

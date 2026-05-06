@@ -1,0 +1,45 @@
+@startuml sequence
+!theme plain
+
+actor "Simulator" as sim
+participant "Caddy\n(reverse proxy)" as caddy
+participant "API Controller" as ctrl
+participant "CheepService" as svc
+participant "CheepRepository" as repo
+database "PostgreSQL" as db
+
+sim -> caddy : POST /msgs/{username}\n{content: "Hello world"}
+caddy -> ctrl : forward request
+
+ctrl -> ctrl : validate Authorization header
+
+alt unauthorized
+  ctrl --> caddy : 403 Forbidden
+  caddy --> sim : 403 Forbidden
+end
+
+ctrl -> svc : GetAuthorByName(username)
+svc -> repo : GetAuthorByName(username)
+repo -> db : SELECT FROM "AspNetUsers"\nWHERE UserName = username
+db --> repo : Author entity
+repo --> svc : AuthorDTO
+svc --> ctrl : AuthorDTO
+
+alt author not found
+  ctrl --> caddy : 404 Not Found
+  caddy --> sim : 404 Not Found
+end
+
+ctrl -> ctrl : build CheepDTO\n(text, timestamp, author)
+ctrl -> svc : CreateCheep(cheepDTO)
+svc -> repo : CreateCheep(cheepDTO)
+repo -> db : INSERT INTO "Cheeps"\n(Text, TimeStamp, AuthorId)
+db --> repo : OK
+repo --> svc : void
+svc --> ctrl : void
+
+ctrl -> ctrl : ChirpMetrics\n.CheepsCreated.Inc()
+
+ctrl --> caddy : 204 No Content
+caddy --> sim : 204 No Content
+@enduml

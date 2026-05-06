@@ -5,7 +5,7 @@
 
 #set document(
   title: "ITU-MiniTwit — Group X Report",
-  author: ("Member A", "Member B", "Member C", "Member D", "Phillip Nikolai Rasmussen"),
+  author: ("Alexander Rossau", "Member B", "Member C", "Member D", "Phillip Nikolai Rasmussen"),
 )
 
 #set page(
@@ -50,16 +50,16 @@
   #text(size: 13pt, weight: "bold")[Group X] \
   #v(1em)
   #text(size: 11pt)[
-    Member A \<id1\@itu.dk\> \
+    Alexander Rossau \<ross\@itu.dk\> \
     Member B \<id2\@itu.dk\> \
     Member C \<id3\@itu.dk\> \
     Member D \<id4\@itu.dk\> \
-    Phillip Nikolai Rasmussesn \<phir\@itu.dk\>
+    Phillip Nikolai Rasmussen \<phir\@itu.dk\>
   ] \
   #v(2em)
   #text(size: 11pt)[
     BSc DevOps, Software Evolution and Software Maintenance \
-    IT University of Copenhagen --- Spring 2026
+    IT University of Copenhagen - Spring 2026
   ] \
   #v(0.5em)
   #text(size: 11pt)[#datetime.today().display("[day]/[month]/[year]")]
@@ -74,11 +74,9 @@
 // 1. Introduction
 // =========================
 = Introduction
-#author-tag("Member A")
+#author-tag("Alexander Rossau")
 
-One paragraph framing the project, the team's high-level goals, and pointers to:
-the main repository, issue tracker, monitoring dashboard, and logging dashboard.
-~100 words.
+This report documents the design, operation, and evolution of _ITU-MiniTwit_, a Twitter-like microblogging platform built as part of the DevOps, Software Evolution and Software Maintenance course at ITU Copenhagen, Spring 2026. Users can register, post short messages ("cheeps"), follow other authors, and comment on posts. The system was re-implemented from a legacy Flask application into a C\#/ASP.NET stack and deployed on cloud infrastructure using Docker Swarm. The source code is hosted at #link("https://github.com/Anders0106/Devops2026")[GitHub], with work tracked via the #link("https://github.com/Anders0106/Devops2026/issues")[issue tracker]. Operational metrics are available in Grafana and logs are aggregated through Grafana/Loki.
 
 // =========================
 // 2. System's Perspective
@@ -86,43 +84,52 @@ the main repository, issue tracker, monitoring dashboard, and logging dashboard.
 = System's Perspective
 
 == Architecture and Design
-#author-tag("Member A")
+#author-tag("Alexander Rossau")
 
-Describe the architecture using three viewpoints. If you invent a notation, include
-a legend.
+*Allocation viewpoint.* @fig:deployment shows the production deployment. The
+system runs as a Docker Swarm stack on a DigitalOcean droplet. This can be deployed in one command, using the included Terraform files in the `infrastructure` directory.
 
-// #figure(
-//   image("images/deployment.png", width: 90%),
-//   caption: [Allocation viewpoint --- UML deployment diagram of the production system.],
-// ) <fig:deployment>
+Caddy acts as a reverse proxy with IP-hash load balancing, forwarding HTTP traffic to the `chirp-web` application container. The application connects to a PostgreSQL~17 database over the internal Docker overlay network. Observability is co-located: Prometheus scrapes application metrics (exposed via `/metrics`) and a `postgres-exporter` sidecar; Promtail ships container logs to Loki; and Grafana queries both Prometheus and Loki for dashboards and alerting. Shepherd polls the GitHub Container Registry and performs rolling updates when a new image tagged `latest` is published. We've used this rolling-update pattern since the start of the project to enable zero-downtime deployments, with manual redeploys and database migrations being the exceptions where downtime did occur.
 
-// #figure(
-//   image("images/components.png", width: 80%),
-//   caption: [Module viewpoint --- component/package decomposition.],
-// ) <fig:components>
+On our main deployment used in this course, we use Tailscale Funnel to expose the service to the internet on ports 80 and 443. This allows access to the service from anywhere, without exposing the server's public IP address directly. The tradeoff with this is that all requests take a latency penalty, as they are routed through Tailscale's network - which is not meant for production traffic. In a real production environment, we would use a custom domain and configure it in Caddy to handle the traffic.
 
-// #figure(
-//   image("images/sequence.png", width: 85%),
-//   caption: [Component & Connector viewpoint --- sequence diagram for a representative request.],
-// ) <fig:sequence>
+#figure(
+  image("images/deployment.png", width: 90%),
+  caption: [Allocation viewpoint - UML deployment diagram of the production system.],
+) <fig:deployment>
+
+*Module viewpoint.* @fig:components illustrates the package decomposition. The codebase follows an onion architecture across four .NET projects. `Chirp.Core` defines the domain model (`Author`, `Cheep`, `Follow`, `Comment`) and DTOs with no outward dependencies. `Chirp.Repositories` provides Entity Framework Core access to PostgreSQL through `ChirpDBContext` and depends only on `Core`. `Chirp.Services` contains business logic (`CheepService`) and depends on repository interfaces. `Chirp.Razor` is the outermost layer, hosting ASP.NET Razor Pages for the web UI and an API controller that implements the simulator endpoints (`/msgs`, `/fllws`, `/register`). Prometheus counters (`ChirpMetrics`) are recorded in this layer. This separation allows the CI pipeline to run integration tests against a temporary database instance, without the web layer.
+
+#figure(
+  image("images/components.png", width: 80%),
+  caption: [Module viewpoint - component/package decomposition.],
+) <fig:components>
+
+*Component & Connector viewpoint.* @fig:sequence traces the "post a cheep" flow through the system. A simulator `POST /msgs/{username}` request is received by Caddy, forwarded to the API controller, which validates the authorization header, resolves the author through `CheepService`, and delegates persistence to `CheepRepository`. After the cheep is inserted into PostgreSQL, the controller increments the `chirp_cheeps_created_total` Prometheus counter and returns `204 No Content`.
+
+#figure(
+  image("images/sequence.png", width: 85%),
+  caption: [Component & Connector viewpoint - sequence diagram for posting a cheep.],
+) <fig:sequence>
 
 == Dependencies
 #author-tag("Member B")
 
-#figure(
-  table(
-    columns: (auto, 1fr, 1fr),
-    align: (left, left, left),
-    table.header[*Layer*][*Tool / Technology*][*Purpose*],
-    [Runtime], [Bun + Elysia], [HTTP server, request handling],
-    [Data], [PostgreSQL @ PlanetScale], [Primary persistence],
-    [Infra], [Docker Swarm on Hetzner+OCI], [Hosting & orchestration],
-    [CI/CD], [GitHub Actions], [Build, test, deploy],
-    [Observability], [Grafana / Loki / Prometheus], [Metrics & logs],
-    [Secrets], [Doppler], [Secret distribution],
-  ),
-  caption: [Key dependencies, by layer.],
-) <tab:deps>
+// #figure(
+//   table(
+//     columns: (auto, 1fr, 1fr),
+//     align: (left, left, left),
+//     table.header[*Layer*][*Tool / Technology*][*Purpose*],
+//     [Runtime], [Bun + Elysia], [HTTP server, request handling],
+//     [Data], [PostgreSQL @ PlanetScale], [Primary persistence],
+//     [Infra], [Docker Swarm on Hetzner+OCI], [Hosting & orchestration],
+//     [CI/CD], [GitHub Actions], [Build, test, deploy],
+//     [Observability], [Grafana / Loki / Prometheus], [Metrics & logs],
+//     [Secrets], [Doppler], [Secret distribution],
+//   ),
+//   caption: [Key dependencies, by layer.],
+// ) <tab:deps>
+// TODO: Add dependencies table (above is an example)
 
 == Current State
 #author-tag("Member B")
@@ -181,7 +188,7 @@ handled.
 #author-tag("Member E")
 
 Biggest issues with respect to *evolution & refactoring*, *operation*, and
-*maintenance* --- each anchored to specific commits, PRs, and issues. Close with a
+*maintenance* - each anchored to specific commits, PRs, and issues. Close with a
 paragraph on the team's "DevOps style".
 
 // =========================
