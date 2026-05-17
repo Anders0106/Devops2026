@@ -164,13 +164,22 @@ release.
 Replicas, autoscaling, multi-region setup, failure modes, recovery procedures.
 
 == Monitoring
-#author-tag("Member D")
+#author-tag("Anders Hansen")
 
 What is monitored (golden signals + business metrics), collection mechanism,
 dashboards. Link the dashboards.
 
+When managing a website, Availability is key. Monitoring facilitates availability and is an important aid in noticing and diagnosing a problem with a web application. 
+
+In this project we use Grafana for visualization and Prometheus to collect and provide the Data that is displayed. Prometheus scrapes the data from a frontend-, and a backend source.  The frontend data comes from an exposed endpoint on the website, "/metrics". This endpoint primarily provides business relevant metrics, such as how many cheeps or comments are created by users. Prometheus scrapes the backend data through postgres-exporter. This data can be split up intro reactive- and proactive Monitoring. We use reactive monitoring to see wether the database is active. Furthermore, we also use proactive monitoring to be able to identify problems in advance. Examples include monitoring the size of the database and also how high the cache hit rate is. E.g. when we monitor the database size we would be to set an alarm that notifies on 10% available space left and act on this - proactive monitoring.
+
+#figure(
+  image("images/PostgresMonitoring.png", width: 90%),
+  caption: [Monitoring overview of postgres database],
+) <fig:monitoring>
+
 == Logging
-#author-tag("Member D")
+#author-tag("Anders Hansen")
 
 What is logged, structured-log conventions, aggregation, retention. Link the logging UI.
 
