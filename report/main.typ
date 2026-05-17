@@ -171,7 +171,7 @@ dashboards. Link the dashboards.
 
 When managing a website, Availability is key. Monitoring facilitates availability and is an important aid in noticing and diagnosing a problem with a web application. 
 
-In this project we use Grafana for visualization and Prometheus to collect and provide the Data that is displayed. Prometheus scrapes the data from a frontend-, and a backend source.  The frontend data comes from an exposed endpoint on the website, "/metrics". This endpoint primarily provides business relevant metrics, such as how many cheeps or comments are created by users. Prometheus scrapes the backend data through postgres-exporter. This data can be split up intro reactive- and proactive Monitoring. We use reactive monitoring to see wether the database is active. Furthermore, we also use proactive monitoring to be able to identify problems in advance. Examples include monitoring the size of the database and also how high the cache hit rate is. E.g. when we monitor the database size we would be to set an alarm that notifies on 10% available space left and act on this - proactive monitoring.
+In this project we use Grafana for visualization and Prometheus to collect and provide the data that is displayed. Prometheus scrapes the data from a frontend-, and a backend source.  The frontend data comes from an exposed endpoint on the website, "/metrics". This endpoint primarily provides business relevant metrics, such as how many cheeps or comments are created by users. Prometheus also scrapes the backend data through postgres-exporter. This data can be split up into reactive- and proactive Monitoring. We use reactive monitoring to see whether the database is active. Furthermore, we also use proactive monitoring to be able to identify problems in advance. Examples include monitoring the size of the database and also how high the cache hit rate is. E.g. when we monitor the database size we could set an alarm that notifies on 10% available disk space - proactive monitoring.
 
 #figure(
   image("images/PostgresMonitoring.png", width: 90%),
@@ -182,6 +182,32 @@ In this project we use Grafana for visualization and Prometheus to collect and p
 #author-tag("Anders Hansen")
 
 What is logged, structured-log conventions, aggregation, retention. Link the logging UI.
+
+
+While monitoring is key for availability, logging is key for diagnosing a problem. For this project we use the built-in logger function in the .NET library. Promtail collects these logs from the docker containers together with OS logs. They are then all sent aggregated to Loki. Loki stores the logs with a timestamp and they are afterwards displayed in Grafana.
+
+The logs are structured. They are sent as JSON objects and include information such as: containerid, POST/GET, endpoint, responstime, a description of what was logged. 
+
+We log many different things. Below are some grouped examples:
+
+
+*Security events*
+A user fails/succeeds to register
+A user fails/succeeds to login
+
+*business-critical operations*
+A users timeline is accessed
+A user follows/unfollows another user
+A user creates/deletes a cheep
+
+*Errors*
+Exceptions
+
+*System events*
+System logs
+
+Performance can also be tracked through responstime time - if this is too slow, something could be wrong and a request is instead logged as a warning.
+
 
 == Security Hardening
 #author-tag("Member D")
