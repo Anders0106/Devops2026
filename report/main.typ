@@ -5,7 +5,7 @@
 
 #set document(
   title: "ITU-MiniTwit — Group X Report",
-  author: ("Alexander Rossau", "Alexander Frederiksen", "Member C", "Anders Hansen", "Phillip Nikolai Rasmussen"),
+  author: ("Alexander Rossau", "Alexander Frederiksen", "David Nicholas Nielsen", "Anders Hansen", "Phillip Nikolai Rasmussen"),
 )
 
 #set page(
@@ -52,7 +52,7 @@
   #text(size: 11pt)[
     Alexander Rossau \<ross\@itu.dk\> \
     Alexander Frederiksen \<alefr\@itu.dk\> \
-    Member C \<id3\@itu.dk\> \
+    David Nicholas Nielsen \<davn\@itu.dk\> \
     Member D \<id4\@itu.dk\> \
     Phillip Nikolai Rasmussen \<phir\@itu.dk\>
   ] \
@@ -172,25 +172,38 @@ Our repository has 3 GitHub Actions workflows (`ci.yml`, `devskim.yml`, and `rel
 = Process Perspective
 
 == CI/CD Pipeline
-#author-tag("Member C")
+#author-tag("David Nicholas Nielsen")
+
+The CI/CD pipeline is implemented using the tools listed below:
+- We use Git and GitHub for version control and code hosting.
+- We use GitHub Actions for automatically testing and deploying the application.
+- We use Docker for containerization, Docker Hub for container registry, and Docker Swarm for orchestration and deployment.
+- We use Terraform for infrastructure as code, provisioning our DigitalOcean droplet and Docker Swarm cluster.
 
 // #figure(
 //   image("images/cicd.png", width: 95%),
 //   caption: [CI/CD pipeline from commit to production.],
 // ) <fig:cicd>
 
-End-to-end stages and tools, including triggers, gates, and artifacts produced.
+// End-to-end stages and tools, including triggers, gates, and artifacts produced.
+
+Regarding GitHub Actions, we have set up three workflows:
+1. *CI*: runs on every push and pull request, executing tests, as well as static analysis with Semgrep. It enforces quality gates by failing if tests do not pass or if Semgrep finds critical issues.
+2. *DevSkim Security Scan*: runs on every push to the `main` branch, scanning for security issues with DevSkim and failing if any are found.
+3. *Build and Push Docker Image on Release*: runs whenever a new release is published, building a new Docker image, pushing it to Docker Hub.
 
 == Deployment and Release
-#author-tag("Member C")
+#author-tag("David Nicholas Nielsen")
 
-Versioning scheme, environments, rollout strategy, rollback. Link a representative
-release.
+The Docker Swarm is configured to automatically update to use the newest available release of ITU-MiniTwit. We use a tool called _Shepherd_ periodically checks for new releases. If a new release is found, it performs a rolling update of the stack, meaning that the new version is deployed to one replica at a time. In case of a failed deployment, the stack will automatically roll back to the previous version.
+// Versioning scheme, environments, rollout strategy, rollback. Link a representative release.
 
 == Availability and Scaling
-#author-tag("Member C")
+#author-tag("David Nicholas Nielsen")
 
-Replicas, autoscaling, multi-region setup, failure modes, recovery procedures.
+Currently, the system always creates exactly one replica of each service, and if a replica fails, the container is restarted. To increase availability, we could scale horizontally by increasing the number of replicas and use Caddy for load-balancing. The number of replicas could be set to a higher number, or it could be adjusted dynamically based on the load. This would allow the system to handle more traffic and provide tolerance in case of failures. Of course, in a real-world scenario, simply increasing the number of replicas may not be enough to ensure high availability, as we would need to consider other possible bottlenecks, such as the single database.
+
+//Replicas, autoscaling, multi-region setup, failure modes, recovery procedures.
 
 == Monitoring
 #author-tag("Anders Hansen")
