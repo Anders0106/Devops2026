@@ -122,7 +122,7 @@ On our main deployment used in this course, we use Tailscale Funnel to expose th
      table.header[*Layer*][*Tool / Technology*][*Purpose*],
      //[Runtime], [Bun + Elysia], [HTTP server, request handling],
      [Runtime], [ASP.NET Core (.NET)], [HTTP server, request handling],
-     [ORM], [Entity Framework core], [Dataabase access],
+     [ORM], [Entity Framework core], [Database access],
      //[Data], [PostgreSQL @ PlanetScale], [Primary persistence],
      [Data], [PostgreSQL (Docker container, accessed via Npgsql/EF Core)], [Primary persistence],
      [Containerization], [Docker], [Service isolation & deployment],
