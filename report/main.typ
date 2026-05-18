@@ -112,6 +112,9 @@ On our main deployment used in this course, we use Tailscale Funnel to expose th
   caption: [Component & Connector viewpoint - sequence diagram for posting a cheep.],
 ) <fig:sequence>
 
+
+
+
 == Dependencies
 //#author-tag("Alexander F")
 
@@ -145,16 +148,30 @@ The system is deployed using Docker Swarm, and the infrastructure is from using 
 
 For observability, we are using Prometheus to collect metrics from the program, while Loki and Promtail handle the log aggregation and Grafana is used to visualize both the metrics and the logs through its dashboards.
 == Current State
-#author-tag("Member B")
+//#author-tag("Alexande F")
+Our system are using GitHub Actions for continuous integration and automated validation. The CI pipeline makes static analysis, automated builds, database-backed testing, and browser-based integration testing with ever commit.
 
-Static analysis findings (Semgrep / ESLint / Sonar), test coverage, technical-debt
-hotspots, and quality gates enforced in CI. Cite concrete numbers.
+The project contains four different kinds of automated test like unit tests, integration tests, UI tests, and end-to-end tests. These test are done in the CI pipeline using `make test`. 
+
+Static analysis and security scanning are done using Semgrep with rulesets targeting C\#, Dockerfiles, and the OWASP Top 10. The CI workflow also provisions a PostgreSQL container under testing to support the integration tests against a database environment. The end-to-end testing supports the Playwright browser automation test.
+
+The system as it is right now contains 34 build warnings like 'nullable-reference warnings', 'logging-analysis warnings', 'unused-variable warnings' and 'test-analyzer warnings'. In additon to 1 known package warning (`NU1903` there are related to the `Microsoft.Build 17.8.3`). These warnings mostly concerns nullable-reference handling and package dependency issues. Even though this warnings is there, our  system builds fine and runs successfully.
+
+Our repository has 3 GitHub Actions workflows (`ci.yml`, `devskim.yml`, and `release-docker.yml`) supporting the automated testing, the security scanning, and also the deployment processes.
+
+
+#figure(caption: [warning part 1], 
+  image("images/warnings1.png")
+)
+#figure(caption: [warning part 2], 
+  image("images/warnings2.png")
+)
 
 // =========================
 // 3. Process Perspective
 // =========================
 = Process Perspective
-
+  
 == CI/CD Pipeline
 #author-tag("Member C")
 
