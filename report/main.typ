@@ -5,7 +5,7 @@
 
 #set document(
   title: "ITU-MiniTwit — Group X Report",
-  author: ("Alexander Rossau", "Alexander Frederiksen", "Member C", "Member D", "Phillip Nikolai Rasmussen"),
+  author: ("Alexander Rossau", "Alexander Frederiksen", "Member C", "Anders Hansen", "Phillip Nikolai Rasmussen"),
 )
 
 #set page(
@@ -112,9 +112,6 @@ On our main deployment used in this course, we use Tailscale Funnel to expose th
   caption: [Component & Connector viewpoint - sequence diagram for posting a cheep.],
 ) <fig:sequence>
 
-
-
-
 == Dependencies
 //#author-tag("Alexander F")
 
@@ -147,7 +144,9 @@ Our MiniTwit system is built in C\# and runs with ASP.NET Core via .NET as our w
 The system is deployed using Docker Swarm, and the infrastructure is from using Terraform.
 
 For observability, we are using Prometheus to collect metrics from the program, while Loki and Promtail handle the log aggregation and Grafana is used to visualize both the metrics and the logs through its dashboards.
+
 == Current State
+#author-tag("Member B")
 //#author-tag("Alexande F")
 Our system are using GitHub Actions for continuous integration and automated validation. The CI pipeline makes static analysis, automated builds, database-backed testing, and browser-based integration testing with ever commit.
 
@@ -171,7 +170,7 @@ Our repository has 3 GitHub Actions workflows (`ci.yml`, `devskim.yml`, and `rel
 // 3. Process Perspective
 // =========================
 = Process Perspective
-  
+
 == CI/CD Pipeline
 #author-tag("Member C")
 
@@ -214,12 +213,11 @@ In this project we use Grafana for visualization and Prometheus to collect and p
 What is logged, structured-log conventions, aggregation, retention. Link the logging UI.
 
 
-While monitoring is key for availability, logging is key for diagnosing a problem. For this project we use the built-in logger function in the .NET library. Promtail collects these logs from the docker containers together with OS logs. They are then all sent aggregated to Loki. Loki stores the logs with a timestamp and they are afterwards displayed in Grafana.
+While monitoring is key for availability, logging is key for diagnosing a problem. For this project we use the built-in logging functionality in the .NET library. Promtail collects these logs from the docker containers together with OS logs. They are then all sent to Loki, which is responsible for aggregating and storing them. At last, the logs are displayed chronoligacally in Grafana.
 
-The logs are structured. They are sent as JSON objects and include information such as: containerid, POST/GET, endpoint, responstime, IP-adress, a description of what was logged. 
+The logs are structured. They are sent as JSON objects and include information that can help us debug/recall what has happened, such as: containerid, POST/GET, endpoint, responstime, IP-adress, a description of what was logged. 
 
 We log many different things. Below are some grouped examples:
-
 
 *Security events*
 A user fails/succeeds to register
@@ -236,7 +234,7 @@ Exceptions
 *System events*
 System logs
 
-Performance can also be tracked through responstime time - if this is too slow, something could be wrong and a request is instead logged as a warning.
+Performance can also be tracked through responstime time - if this is too slow, something could be wrong and a request is instead logged as the type - warning.
 
 
 == Security Hardening
@@ -246,9 +244,30 @@ Threat-model summary and concrete mitigations: TLS, secrets management, dependen
 scanning, container hardening, branch protection, SAST/DAST. Reference any incidents
 handled.
 
-Firewall, running containers as root, reverse proxy, TLS/HTTPS,
+Security is important, especially since our application contains sensetive information such as passwords. The following sections describes how we try to implement the defense in depth model.
 
-Security is important, espcially since our application contains personal information such as passwords. First, our webapplication uses HTTPS meaning that all communication between client and server is encrypted. Additionally these password are never stored as plain text, but  Additionally, the server only speak to the client through a reverse proxy.
+*TLS*
+All communication between client and server is secured using HTTPS, ensuring that data is encrypted in transit.
+
+*Hashing*
+User passwords are never stored in plain text. Instead, they are stored using salted hashing.
+
+*Network*
+All communication between clients and the server happens through a reverse proxy. This adds an additional security layer and the opportunity to filter various malicioius requests before they ever reach the server. E.g. ddos attacks by maximising amount of requests from one IP-adress.
+
+
+We keep as few ports open as possible. In figure ?? our firewall rules can be seen.
+
+SHOULD WRITE ABOUT PROBLEMS WITH FIREWALL WHEN DISTRIBUITING SERVER??
+SÆT BILLEDE IND AF "ufw status numbered"
+
+*Least privileges*
+Every container is run with least possible privileges. As seen in @fig:ContainerUser, most containers are not run as root.
+
+#figure(
+  image("images/ContainerUser.png", width: 90%),
+  caption: [Overview of what user each container from docker swarm is run as],
+) <fig:ContainerUser>
 
 // =========================
 // 4. Reflection Perspective
