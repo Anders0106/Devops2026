@@ -5,7 +5,7 @@
 
 #set document(
   title: "ITU-MiniTwit — Group X Report",
-  author: ("Alexander Rossau", "Alexander Frederiksen", "David Nicholas Nielsen", "Member D", "Phillip Nikolai Rasmussen"),
+  author: ("Alexander Rossau", "Alexander Frederiksen", "Member C", "Anders Hansen", "Phillip Nikolai Rasmussen"),
 )
 
 #set page(
@@ -52,7 +52,7 @@
   #text(size: 11pt)[
     Alexander Rossau \<ross\@itu.dk\> \
     Alexander Frederiksen \<alefr\@itu.dk\> \
-    David Nicholas Nielsen \<davn\@itu.dk\> \
+    Member C \<id3\@itu.dk\> \
     Member D \<id4\@itu.dk\> \
     Phillip Nikolai Rasmussen \<phir\@itu.dk\>
   ] \
@@ -144,11 +144,27 @@ Our MiniTwit system is built in C\# and runs with ASP.NET Core via .NET as our w
 The system is deployed using Docker Swarm, and the infrastructure is from using Terraform.
 
 For observability, we are using Prometheus to collect metrics from the program, while Loki and Promtail handle the log aggregation and Grafana is used to visualize both the metrics and the logs through its dashboards.
+
 == Current State
 #author-tag("Member B")
+//#author-tag("Alexande F")
+Our system are using GitHub Actions for continuous integration and automated validation. The CI pipeline makes static analysis, automated builds, database-backed testing, and browser-based integration testing with ever commit.
 
-Static analysis findings (Semgrep / ESLint / Sonar), test coverage, technical-debt
-hotspots, and quality gates enforced in CI. Cite concrete numbers.
+The project contains four different kinds of automated test like unit tests, integration tests, UI tests, and end-to-end tests. These test are done in the CI pipeline using `make test`. 
+
+Static analysis and security scanning are done using Semgrep with rulesets targeting C\#, Dockerfiles, and the OWASP Top 10. The CI workflow also provisions a PostgreSQL container under testing to support the integration tests against a database environment. The end-to-end testing supports the Playwright browser automation test.
+
+The system as it is right now contains 34 build warnings like 'nullable-reference warnings', 'logging-analysis warnings', 'unused-variable warnings' and 'test-analyzer warnings'. In additon to 1 known package warning (`NU1903` there are related to the `Microsoft.Build 17.8.3`). These warnings mostly concerns nullable-reference handling and package dependency issues. Even though this warnings is there, our  system builds fine and runs successfully.
+
+Our repository has 3 GitHub Actions workflows (`ci.yml`, `devskim.yml`, and `release-docker.yml`) supporting the automated testing, the security scanning, and also the deployment processes.
+
+
+#figure(caption: [warning part 1], 
+  image("images/warnings1.png")
+)
+#figure(caption: [warning part 2], 
+  image("images/warnings2.png")
+)
 
 // =========================
 // 3. Process Perspective
@@ -156,43 +172,30 @@ hotspots, and quality gates enforced in CI. Cite concrete numbers.
 = Process Perspective
 
 == CI/CD Pipeline
-#author-tag("David Nicholas Nielsen")
-
-The CI/CD pipeline is implemented using the tools listed below:
-- We use Git and GitHub for version control and code hosting.
-- We use GitHub Actions for automatically testing and deploying the application.
-- We use Docker for containerization, Docker Hub for container registry, and Docker Swarm for orchestration and deployment.
-- We use Terraform for infrastructure as code, provisioning our DigitalOcean droplet and Docker Swarm cluster.
+#author-tag("Member C")
 
 // #figure(
 //   image("images/cicd.png", width: 95%),
 //   caption: [CI/CD pipeline from commit to production.],
 // ) <fig:cicd>
 
-// End-to-end stages and tools, including triggers, gates, and artifacts produced.
-
-Regarding GitHub Actions, we have set up three workflows:
-1. *CI*: runs on every push and pull request, executing tests, as well as static analysis with Semgrep. It enforces quality gates by failing if tests do not pass or if Semgrep finds critical issues.
-2. *DevSkim Security Scan*: runs on every push to the `main` branch, scanning for security issues with DevSkim and failing if any are found.
-3. *Build and Push Docker Image on Release*: runs whenever a new release is published, building a new Docker image, pushing it to Docker Hub.
-
-// What happens afterwards? How does the server automatically update?
+End-to-end stages and tools, including triggers, gates, and artifacts produced.
 
 == Deployment and Release
-#author-tag("David Nicholas Nielsen")
+#author-tag("Member C")
 
-The Docker Swarm is configured to automatically update to use the newest available release of ITU-MiniTwit. We use a tool called _Shepherd_ periodically checks for new releases. If a new release is found, it performs a rolling update of the stack, meaning that the new version is deployed to one replica at a time. In case of a failed deployment, the stack will automatically roll back to the previous version.
-// Versioning scheme, environments, rollout strategy, rollback. Link a representative release.
+Versioning scheme, environments, rollout strategy, rollback. Link a representative
+release.
 
 == Availability and Scaling
-#author-tag("David Nicholas Nielsen")
+#author-tag("Member C")
 
-Currently, the system always creates exactly one replica of each service, and if a replica fails, the container is restarted. To increase availability, we could scale horizontally by increasing the number of replicas and use Caddy for load-balancing. The number of replicas could be set to a higher number, or it could be adjusted dynamically based on the load. This would allow the system to handle more traffic and provide tolerance in case of failures. Of course, in a real-world scenario, simply increasing the number of replicas may not be enough to ensure high availability, as we would need to consider other possible bottlenecks, such as the single database.
-//Replicas, autoscaling, multi-region setup, failure modes, recovery procedures.
+Replicas, autoscaling, multi-region setup, failure modes, recovery procedures.
 
 == Monitoring
 #author-tag("Anders Hansen")
 
+What is monitored (golden signals + business metrics), collection mechanism,
 dashboards. Link the dashboards.
 
 When managing a website, Availability is key. Monitoring facilitates availability and is an important aid in noticing and diagnosing a problem with a web application. 
@@ -210,12 +213,11 @@ In this project we use Grafana for visualization and Prometheus to collect and p
 What is logged, structured-log conventions, aggregation, retention. Link the logging UI.
 
 
-While monitoring is key for availability, logging is key for diagnosing a problem. For this project we use the built-in logger function in the .NET library. Promtail collects these logs from the docker containers together with OS logs. They are then all sent aggregated to Loki. Loki stores the logs with a timestamp and they are afterwards displayed in Grafana.
+While monitoring is key for availability, logging is key for diagnosing a problem. For this project we use the built-in logging functionality in the .NET library. Promtail collects these logs from the docker containers together with OS logs. They are then all sent to Loki, which is responsible for aggregating and storing them. At last, the logs are displayed chronoligacally in Grafana.
 
-The logs are structured. They are sent as JSON objects and include information such as: containerid, POST/GET, endpoint, responstime, a description of what was logged. 
+The logs are structured. They are sent as JSON objects and include information that can help us debug/recall what has happened, such as: containerid, POST/GET, endpoint, responstime, IP-adress, a description of what was logged. 
 
 We log many different things. Below are some grouped examples:
-
 
 *Security events*
 A user fails/succeeds to register
@@ -232,15 +234,40 @@ Exceptions
 *System events*
 System logs
 
-Performance can also be tracked through responstime time - if this is too slow, something could be wrong and a request is instead logged as a warning.
+Performance can also be tracked through responstime time - if this is too slow, something could be wrong and a request is instead logged as the type - warning.
 
 
 == Security Hardening
-#author-tag("Member D")
+#author-tag("Anders Hansen")
 
 Threat-model summary and concrete mitigations: TLS, secrets management, dependency
 scanning, container hardening, branch protection, SAST/DAST. Reference any incidents
 handled.
+
+Security is important, especially since our application contains sensetive information such as passwords. The following sections describes how we try to implement the defense in depth model.
+
+*TLS*
+All communication between client and server is secured using HTTPS, ensuring that data is encrypted in transit.
+
+*Hashing*
+User passwords are never stored in plain text. Instead, they are stored using salted hashing.
+
+*Network*
+All communication between clients and the server happens through a reverse proxy. This adds an additional security layer and the opportunity to filter various malicioius requests before they ever reach the server. E.g. ddos attacks by maximising amount of requests from one IP-adress.
+
+
+We keep as few ports open as possible. In figure ?? our firewall rules can be seen.
+
+SHOULD WRITE ABOUT PROBLEMS WITH FIREWALL WHEN DISTRIBUITING SERVER??
+SÆT BILLEDE IND AF "ufw status numbered"
+
+*Least privileges*
+Every container is run with least possible privileges. As seen in @fig:ContainerUser, most containers are not run as root.
+
+#figure(
+  image("images/ContainerUser.png", width: 90%),
+  caption: [Overview of what user each container from docker swarm is run as],
+) <fig:ContainerUser>
 
 // =========================
 // 4. Reflection Perspective
