@@ -5,7 +5,7 @@
 
 #set document(
   title: "ITU-MiniTwit — Group X Report",
-  author: ("Alexander Rossau", "Alexander Frederiksen", "David Nicholas Nielsen", "Anders Hansen", "Phillip Nikolai Rasmussen"),
+  author: ("Member A", "Member B", "Member C", "Member D", "Phillip Nikolai Rasmussen"),
 )
 
 #set page(
@@ -286,20 +286,34 @@ Every container is run with least possible privileges. As seen in @fig:Container
 // 4. Reflection Perspective
 // =========================
 = Reflection Perspective
-#author-tag("Member E")
+#author-tag("Phillip Nikolai Rasmussen")
 
-Biggest issues with respect to *evolution & refactoring*, *operation*, and
-*maintenance* - each anchored to specific commits, PRs, and issues. Close with a
-paragraph on the team's "DevOps style".
+We had some issues figuring out why a lot of follow and cheep API requests were failing. It ended up being a culmination of many small issues not considered when the functions were first created, such as case-sensitive usernames and whitespace handling. This can be seen in commits #link("https://github.com/Anders0106/Devops2026/commit/3428504")[`3428504`], #link("https://github.com/Anders0106/Devops2026/commit/4b511f6")[`4b511f6`], and #link("https://github.com/Anders0106/Devops2026/commit/f05129f")[`f05129f`]. The issue still persisted, so we added logging in commit #link("https://github.com/Anders0106/Devops2026/commit/5d61e5d")[`5d61e5d`] to highlight exactly where things were going wrong.
+
+Another big issue was the migration from SQLite to PostgreSQL (commit #link("https://github.com/Anders0106/Devops2026/commit/315f361")[`315f361`]). SQLite had been handling certain values case-insensitively, which PostgreSQL does not, so we needed a conversion script to fix the existing data (commit #link("https://github.com/Anders0106/Devops2026/commit/be71171")[`be71171`]). On top of that, a lot of tests broke, leading to a string of quick fixes from commits #link("https://github.com/Anders0106/Devops2026/commit/65de226")[`65de226`] to #link("https://github.com/Anders0106/Devops2026/commit/970e37c")[`970e37c`], not fully resolved until #link("https://github.com/Anders0106/Devops2026/commit/8c816e2")[`8c816e2`] two weeks later.
+
+During the maintenance phase, we went through a round of security hardening after realizing the system had some gaps. In a series of commits we added Caddy as a reverse proxy (#link("https://github.com/Anders0106/Devops2026/commit/9adb05c")[`9adb05c`]), bound all service ports to localhost (#link("https://github.com/Anders0106/Devops2026/commit/356062b")[`356062b`]), removed root as the running user from our containers (#link("https://github.com/Anders0106/Devops2026/commit/4113645")[`4113645`]), and added Semgrep for static security analysis (#link("https://github.com/Anders0106/Devops2026/commit/ee46c2e")[`ee46c2e`]). Going through this as a dedicated step made it clear how many small attack surfaces a running system can accumulate without much notice.
+
+The DevOps style of our work was focused on improving the CI/CD flow constantly throughout development. The focus was on fixing issues and making sure that if they reappear, we know right away. Also trying to automate as many things as possible, which made the codebase much easier to work with as the project progressed.
 
 // =========================
 // 5. Use of Generative AI
 // =========================
 = Use of Generative AI
-#author-tag("Member E")
+#author-tag("Phillip Nikolai Rasmussen")
 
-Tools used, tasks they were applied to, how they were used, and a brief reflection
-on whether they helped or hindered. Follow ITU's GenAI guidelines.
+During the project we used Claude (Sonnet 4.6 and Opus 4.6) and GPT-4o as generative AI assistants. The two providers were used interchangeably, choosing whichever gave cleaner output for a given task.
+
+*Learning new tooling* Terraform and Docker Swarm were new to the team. Rather than reading documentation from scratch, we used AI to get targeted explanations and working examples we could adapt to our setup. This significantly reduced the time needed to become productive with each tool.
+
+*Boilerplate generation* Integrating Prometheus, Loki, and Grafana involves a lot of repetitive configuration. AI generated base templates that we then reviewed and adjusted, avoiding the most mechanical parts of the work.
+
+*Test fixes* Approximately 15 existing tests broke during the initial migration. AI diagnosed the failures and proposed fixes quickly. Not a hard task, but one that would have consumed more time without assistance.
+
+*Logging instrumentation.* Once we agreed on a logging convention, AI applied it consistently across the codebase, turning a tedious but low-value task into a matter of minutes.
+
+AI improved our velocity noticeably. The clearest benefit was lowering the barrier to unfamiliar tooling, because getting a working starting point is often the hardest step. The main drawback was overconfident output, particularly with Terraform provider-specific syntax, which occasionally introduced subtle errors we only caught through testing. This taught us to treat AI output as a draft to verify rather than a finished answer, and to always cross-reference official documentation for infrastructure-critical configuration.
+
 
 // =========================
 // References (optional)
