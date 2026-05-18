@@ -186,7 +186,7 @@ What is logged, structured-log conventions, aggregation, retention. Link the log
 
 While monitoring is key for availability, logging is key for diagnosing a problem. For this project we use the built-in logger function in the .NET library. Promtail collects these logs from the docker containers together with OS logs. They are then all sent aggregated to Loki. Loki stores the logs with a timestamp and they are afterwards displayed in Grafana.
 
-The logs are structured. They are sent as JSON objects and include information such as: containerid, POST/GET, endpoint, responstime, a description of what was logged. 
+The logs are structured. They are sent as JSON objects and include information such as: containerid, POST/GET, endpoint, responstime, IP-adress, a description of what was logged. 
 
 We log many different things. Below are some grouped examples:
 
@@ -210,11 +210,15 @@ Performance can also be tracked through responstime time - if this is too slow, 
 
 
 == Security Hardening
-#author-tag("Member D")
+#author-tag("Anders Hansen")
 
 Threat-model summary and concrete mitigations: TLS, secrets management, dependency
 scanning, container hardening, branch protection, SAST/DAST. Reference any incidents
 handled.
+
+Firewall, running containers as root, reverse proxy, TLS/HTTPS,
+
+Security is important, espcially since our application contains personal information such as passwords. First, our webapplication uses HTTPS meaning that all communication between client and server is encrypted. Additionally these password are never stored as plain text, but  Additionally, the server only speak to the client through a reverse proxy.
 
 // =========================
 // 4. Reflection Perspective
