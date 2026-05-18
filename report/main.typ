@@ -5,7 +5,7 @@
 
 #set document(
   title: "ITU-MiniTwit — Group X Report",
-  author: ("Alexander Rossau", "Member B", "Member C", "Member D", "Phillip Nikolai Rasmussen"),
+  author: ("Alexander Rossau", "Alexander Frederiksen", "Member C", "Member D", "Phillip Nikolai Rasmussen"),
 )
 
 #set page(
@@ -51,7 +51,7 @@
   #v(1em)
   #text(size: 11pt)[
     Alexander Rossau \<ross\@itu.dk\> \
-    Member B \<id2\@itu.dk\> \
+    Alexander Frederiksen \<alefr\@itu.dk\> \
     Member C \<id3\@itu.dk\> \
     Member D \<id4\@itu.dk\> \
     Phillip Nikolai Rasmussen \<phir\@itu.dk\>
@@ -113,24 +113,37 @@ On our main deployment used in this course, we use Tailscale Funnel to expose th
 ) <fig:sequence>
 
 == Dependencies
-#author-tag("Member B")
+//#author-tag("Alexander F")
 
-// #figure(
-//   table(
-//     columns: (auto, 1fr, 1fr),
-//     align: (left, left, left),
-//     table.header[*Layer*][*Tool / Technology*][*Purpose*],
-//     [Runtime], [Bun + Elysia], [HTTP server, request handling],
-//     [Data], [PostgreSQL @ PlanetScale], [Primary persistence],
-//     [Infra], [Docker Swarm on Hetzner+OCI], [Hosting & orchestration],
-//     [CI/CD], [GitHub Actions], [Build, test, deploy],
-//     [Observability], [Grafana / Loki / Prometheus], [Metrics & logs],
-//     [Secrets], [Doppler], [Secret distribution],
-//   ),
-//   caption: [Key dependencies, by layer.],
-// ) <tab:deps>
+#figure(
+   table(
+     columns: (auto, 1fr, 1fr),
+     align: (left, left, left),
+     table.header[*Layer*][*Tool / Technology*][*Purpose*],
+     //[Runtime], [Bun + Elysia], [HTTP server, request handling],
+     [Runtime], [ASP.NET Core (.NET)], [HTTP server, request handling],
+     [ORM], [Entity Framework core], [Database access],
+     //[Data], [PostgreSQL @ PlanetScale], [Primary persistence],
+     [Data], [PostgreSQL (Docker container, accessed via Npgsql/EF Core)], [Primary persistence],
+     [Containerization], [Docker], [Service isolation & deployment],
+     [Infra], [Docker Swarm + Terraform (Hetzner/OCI clode)], [Hosting & orchestration],
+     [CI/CD], [GitHub Actions], [Build, test, deploy],
+     [Observability (Monitoring)], [Prometheus], [Metrics collaction],
+     [Observability (Logging)], [Loki + Promtail], [Log aggregation],
+     [Observability (Visualization)], [Grafana], [Dashboard],
+     
+     //[Secrets], [Doppler], [Secret distribution],
+   ),
+   caption: [Key dependencies, by layer.],
+ ) <tab:deps>
 // TODO: Add dependencies table (above is an example)
 
+
+Our MiniTwit system is built in C\# and runs with ASP.NET Core via .NET as our web framework. The data is stored in PostgreSQL database running in a Docker container using the Npgsql provider. Our program is containerized using Docker.
+
+The system is deployed using Docker Swarm, and the infrastructure is from using Terraform.
+
+For observability, we are using Prometheus to collect metrics from the program, while Loki and Promtail handle the log aggregation and Grafana is used to visualize both the metrics and the logs through its dashboards.
 == Current State
 #author-tag("Member B")
 
