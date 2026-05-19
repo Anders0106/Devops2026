@@ -239,8 +239,12 @@ Exceptions #linebreak()
 *System events* #linebreak()
 System logs #linebreak()
 
-Performance can also be tracked through responstime time, if this is too slow, something could be wrong and a request is instead logged as the type - warning.
+Performance can also be tracked through responstime time, if this is too slow, something could be wrong and a request is instead logged as the type - warning. See example of log below @fig:Log
 
+#figure(
+  image("images/Log.png"),
+  caption: [Example of a log of a registered user],
+) <fig:Log>
 
 == Security Hardening
 #author-tag("Anders Georg Frølich Hansen")
