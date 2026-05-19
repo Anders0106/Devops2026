@@ -133,6 +133,8 @@ terraform init
 terraform apply
 ```
 
+![iac](report/images/iac.gif)
+
 Required variables: `do_token`, `github_image_repo`. See `variables.tf` for all options and defaults.
 
 ## Testing
