@@ -147,7 +147,7 @@ The system is deployed using Docker Swarm, and the infrastructure is from using 
 For observability, we are using Prometheus to collect metrics from the program, while Loki and Promtail handle the log aggregation and Grafana is used to visualize both the metrics and the logs through its dashboards.
 
 == Current State
-#author-tag("Alexande F")
+#author-tag("Alexander F")
 
 Our system uses GitHub Actions for continuous integration and automated validation. The CI pipeline makes static analysis, automated builds, database-backed testing, and browser-based integration testing with every commit.
 
