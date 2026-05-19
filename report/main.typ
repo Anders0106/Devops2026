@@ -186,6 +186,11 @@ Regarding GitHub Actions, we have set up the following workflows:
 2. *DevSkim Security Scan*: runs on every push to the `main` branch, scanning for security issues with DevSkim and failing if any are found.
 3. *Build and Push Docker Image on Release*: runs whenever a new release is published, building a new Docker image, pushing it to GitHub Container Registry.
 
+The pipeline is illustrated in the figure below.
+#figure(caption: [CI/CD Pipeline. This diagram shows the flow from local code changes to deployment. Note that other containers are also running on the server, such as those used for the database and the monitoring stack.], 
+  image("images/CICD.png")
+)
+
 == Deployment and Release
 #author-tag("David Nicholas Nielsen")
 
@@ -219,20 +224,20 @@ The logs are structured. They are sent as JSON objects and include information t
 
 We log many different things. Below are some grouped examples:
 
-*Security events*
-A user fails/succeeds to register
-A user fails/succeeds to login
+*Security events* #linebreak()
+A user fails/succeeds to register #linebreak()
+A user fails/succeeds to login #linebreak()
 
-*business-critical operations*
-A users timeline is accessed
-A user follows/unfollows another user
-A user creates/deletes a cheep
+*business-critical operations* #linebreak()
+A users timeline is accessed #linebreak()
+A user follows/unfollows another user #linebreak()
+A user creates/deletes a cheep #linebreak()
 
-*Errors*
-Exceptions
+*Errors* #linebreak()
+Exceptions #linebreak()
 
-*System events*
-System logs
+*System events* #linebreak()
+System logs #linebreak()
 
 Performance can also be tracked through responstime time - if this is too slow, something could be wrong and a request is instead logged as the type - warning.
 
@@ -242,16 +247,16 @@ Performance can also be tracked through responstime time - if this is too slow, 
 
 Security is important, especially since our application contains sensetive information such as passwords. The following sections describes how we try to implement the defense in depth model.
 
-*TLS*
+*TLS* #linebreak()
 All communication between client and server is secured using HTTPS, ensuring that data is encrypted in transit.
 
-*Hashing*
+*Hashing* #linebreak()
 User passwords are never stored in plain text. Instead, they are stored using salted hashing.
 
-*Secret scanning and vulnerability checks*
+*Secret scanning and vulnerability checks* #linebreak()
 As part of the CI/CD pipeline, we automatically scan the codebase for accidentally committed secrets such as passwords. This is done using DevSkim and Semgrep with rules based on OWASP. These tools help identify common vulnerabilities such as SQL injection.
 
-*Network*
+*Network* #linebreak()
 All communication between clients and the server happens through a reverse proxy. This adds an additional security layer and the opportunity to filter various malicioius requests before they ever reach the server. E.g. ddos attacks by maximising amount of requests from one IP-adress.
 
 We keep as few ports open as possible. In figure @fig:firewallRules our firewall rules can be seen.
