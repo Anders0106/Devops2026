@@ -242,7 +242,7 @@ Exceptions #linebreak()
 *System events* #linebreak()
 System logs #linebreak()
 
-Performance can also be tracked through responstime time - if this is too slow, something could be wrong and a request is instead logged as the type - warning.
+Performance can also be tracked through responstime time, if this is too slow, something could be wrong and a request is instead logged as the type - warning.
 
 
 == Security Hardening
@@ -269,7 +269,7 @@ We keep as few ports open as possible. In figure @fig:firewallRules our firewall
   caption: [Overview of what user each container from docker swarm is run as],
 ) <fig:firewallRules>
 
-*Least privileges*
+*Least privileges* #linebreak()
 Every container is run with least possible privileges. As seen in @fig:ContainerUser, most containers are not run as root.
 
 #figure(
