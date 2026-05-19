@@ -204,7 +204,7 @@ Currently, the system always creates exactly one replica of each service, and if
 //Replicas, autoscaling, multi-region setup, failure modes, recovery procedures.
 
 == Monitoring
-#author-tag("Anders Hansen")
+#author-tag("Anders Georg Frølich Hansen")
 
 When managing a website, availability is key. Monitoring facilitates availability and is an important aid in noticing and diagnosing a problem with a web application. 
 
@@ -216,7 +216,7 @@ In this project we use Grafana for visualization and Prometheus to collect and p
 ) <fig:monitoring>
 
 == Logging
-#author-tag("Anders Hansen")
+#author-tag("Anders Georg Frølich Hansen")
 
 Just as monitoring is key for availability, logging is key for diagnosing a problem. For this project we use the built-in logging functionality in the .NET library. Promtail collects these logs from the docker containers together with OS logs. They are then all sent to Loki, which is responsible for aggregating and storing them. At last, the logs are displayed chronologically in Grafana.
 
@@ -239,11 +239,11 @@ Exceptions #linebreak()
 *System events* #linebreak()
 System logs #linebreak()
 
-Performance can also be tracked through responstime time - if this is too slow, something could be wrong and a request is instead logged as the type - warning.
+Performance can also be tracked through responstime time, if this is too slow, something could be wrong and a request is instead logged as the type - warning.
 
 
 == Security Hardening
-#author-tag("Anders Hansen")
+#author-tag("Anders Georg Frølich Hansen")
 
 Security is important, especially since our application contains sensetive information such as passwords. The following sections describes how we try to implement the defense in depth model.
 
@@ -266,7 +266,7 @@ We keep as few ports open as possible. In figure @fig:firewallRules our firewall
   caption: [Overview of what user each container from docker swarm is run as],
 ) <fig:firewallRules>
 
-*Least privileges*
+*Least privileges* #linebreak()
 Every container is run with least possible privileges. As seen in @fig:ContainerUser, most containers are not run as root.
 
 #figure(
