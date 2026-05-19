@@ -206,9 +206,9 @@ Currently, the system always creates exactly one replica of each service, and if
 == Monitoring
 #author-tag("Anders Georg Frølich Hansen")
 
-When managing a website, Availability is key. Monitoring facilitates availability and is an important aid in noticing and diagnosing a problem with a web application. 
+When managing a website, availability is key. Monitoring facilitates availability and is an important aid in noticing and diagnosing a problem with a web application. 
 
-In this project we use Grafana for visualization and Prometheus to collect and provide the data that is displayed. Prometheus scrapes the data from a frontend-, and a backend source.  The frontend data comes from an exposed endpoint on the website, "/metrics". This endpoint primarily provides business relevant metrics, such as how many cheeps or comments are created by users. Prometheus also scrapes the backend data through postgres-exporter. This data can be split up into reactive- and proactive Monitoring. We use reactive monitoring to see whether the database is active. Furthermore, we also use proactive monitoring to be able to identify problems in advance. Examples include monitoring the size of the database and also how high the cache hit rate is. E.g. when we monitor the database size we could set an alarm that notifies on 10% available disk space - proactive monitoring.
+In this project we use Grafana for visualization and Prometheus to collect and provide the data that is displayed. Prometheus scrapes the data from a frontend-, and a backend source. The frontend data comes from an exposed endpoint on the website, "/metrics". This endpoint primarily provides business relevant metrics, such as how many cheeps or comments are created by users. Prometheus also scrapes the backend data through postgres-exporter. This data can be split up into reactive- and proactive monitoring. We use reactive monitoring to see whether the database is active. Furthermore, we also use proactive monitoring to be able to identify problems in advance. Examples include monitoring the size of the database and also how high the cache hit rate is. For an example of proactive monitoring, when we monitor the database size we could set an alarm that notifies on 10% available disk space.
 
 #figure(
   image("images/PostgresMonitoring.png"),
@@ -218,9 +218,9 @@ In this project we use Grafana for visualization and Prometheus to collect and p
 == Logging
 #author-tag("Anders Georg Frølich Hansen")
 
-While monitoring is key for availability, logging is key for diagnosing a problem. For this project we use the built-in logging functionality in the .NET library. Promtail collects these logs from the docker containers together with OS logs. They are then all sent to Loki, which is responsible for aggregating and storing them. At last, the logs are displayed chronoligacally in Grafana.
+Just as monitoring is key for availability, logging is key for diagnosing a problem. For this project we use the built-in logging functionality in the .NET library. Promtail collects these logs from the docker containers together with OS logs. They are then all sent to Loki, which is responsible for aggregating and storing them. At last, the logs are displayed chronologically in Grafana.
 
-The logs are structured. They are sent as JSON objects and include information that can help us debug/recall what has happened, such as: containerid, POST/GET, endpoint, responstime, IP-adress, a description of what was logged. 
+The logs are sent as structured JSON objects and include information that can help us debug/recall what has happened, such as: containerid, POST/GET, endpoint, response time, IP-address, and a description of what was logged. 
 
 We log many different things. Below are some grouped examples:
 
@@ -239,7 +239,7 @@ Exceptions #linebreak()
 *System events* #linebreak()
 System logs #linebreak()
 
-Performance can also be tracked through responstime time, if this is too slow, something could be wrong and a request is instead logged as the type - warning. See example of log below @fig:Log
+Performance can also be tracked through response time, if this is too slow, something could be wrong and a request is instead logged as a warning.
 
 #figure(
   image("images/Log.png"),
@@ -249,33 +249,33 @@ Performance can also be tracked through responstime time, if this is too slow, s
 == Security Hardening
 #author-tag("Anders Georg Frølich Hansen")
 
-Security is important, especially since our application contains sensetive information such as passwords. The following sections describes how we try to implement the defense in depth model.
+Security is important, especially since our application contains sensitive information such as passwords. The following sections describes how we try to implement the defense-in-depth model.
 
 *TLS* #linebreak()
-All communication between client and server is secured using HTTPS, ensuring that data is encrypted in transit.
+All communication between clients and the server is secured using HTTPS, ensuring that data is encrypted in transit.
 
 *Hashing* #linebreak()
 User passwords are never stored in plain text. Instead, they are stored using salted hashing.
 
 *Secret scanning and vulnerability checks* #linebreak()
-As part of the CI/CD pipeline, we automatically scan the codebase for accidentally committed secrets such as passwords. This is done using DevSkim and Semgrep with rules based on OWASP. These tools help identify common vulnerabilities such as SQL injection.
+As part of the CI/CD pipeline, we automatically scan the codebase for accidentally committed secrets such as passwords. This is done using DevSkim and Semgrep with rules based on the OWASP Top 10. These tools help identify common vulnerabilities such as SQL injection.
 
 *Network* #linebreak()
-All communication between clients and the server happens through a reverse proxy. This adds an additional security layer and the opportunity to filter various malicioius requests before they ever reach the server. E.g. ddos attacks by maximising amount of requests from one IP-adress.
+All communication between clients and the server happens through a reverse proxy. This adds an additional security layer and the opportunity to filter various malicious requests before they ever reach the server. For example, a DDoS attack by maximising the amount of requests from one IP-address would be filtered out by the reverse proxy.
 
-We keep as few ports open as possible. In figure @fig:firewallRules our firewall rules can be seen.
+We keep as few ports open as possible. In @fig:firewallRules our firewall rules can be seen.
 
 #figure(
   image("images/FirewallRules.png"),
-  caption: [Overview of what user each container from docker swarm is run as],
+  caption: [Overview of what user each container from Docker Swarm is run as],
 ) <fig:firewallRules>
 
 *Least privileges* #linebreak()
-Every container is run with least possible privileges. As seen in @fig:ContainerUser, most containers are not run as root.
+Every container is run with the least possible privileges. As seen in @fig:ContainerUser, most containers are not run as the root user.
 
 #figure(
   image("images/ContainerUser.png"),
-  caption: [Overview of what user each container from docker swarm is run as],
+  caption: [Overview of what user each container from Docker Swarm is run as],
 ) <fig:ContainerUser>
 
 // =========================
@@ -290,7 +290,7 @@ Another big issue was the migration from SQLite to PostgreSQL (commit #link("htt
 
 During the maintenance phase, we went through a round of security hardening after realizing the system had some gaps. In a series of commits we added Caddy as a reverse proxy (#link("https://github.com/Anders0106/Devops2026/commit/9adb05c")[`9adb05c`]), bound all service ports to localhost (#link("https://github.com/Anders0106/Devops2026/commit/356062b")[`356062b`]), removed root as the running user from our containers (#link("https://github.com/Anders0106/Devops2026/commit/4113645")[`4113645`]), and added Semgrep for static security analysis (#link("https://github.com/Anders0106/Devops2026/commit/ee46c2e")[`ee46c2e`]). Going through this as a dedicated step made it clear how many small attack surfaces a running system can accumulate without much notice.
 
-The DevOps style of our work was focused on improving the CI/CD flow constantly throughout development. The focus was on fixing issues and making sure that if they reappear, we know right away. Also trying to automate as many things as possible, which made the codebase much easier to work with as the project progressed.
+The DevOps style of our work was focused on improving the CI/CD flow constantly throughout development. The focus was on fixing issues and making sure that if they reappear, we know right away, along with trying to automate as many things as possible, which made the codebase much easier to work with as the project progressed.
 
 // =========================
 // 5. Use of Generative AI
@@ -300,13 +300,13 @@ The DevOps style of our work was focused on improving the CI/CD flow constantly 
 
 During the project we used Claude (Sonnet 4.6 and Opus 4.6) and GPT-5.4 as generative AI assistants. The two providers were used interchangeably, choosing whichever gave cleaner output for a given task.
 
-*Learning new tooling* Terraform and Docker Swarm were new to the team. Rather than reading documentation from scratch, we used AI to get targeted explanations and working examples we could adapt to our setup. This significantly reduced the time needed to become productive with each tool.
+*Learning new tooling* - Terraform and Docker Swarm were new to the team. Rather than reading documentation from scratch, we used AI to get targeted explanations and working examples we could adapt to our setup. This significantly reduced the time needed to become productive with each tool.
 
-*Boilerplate generation* Integrating Prometheus, Loki, and Grafana involves a lot of repetitive configuration. AI generated base templates that we then reviewed and adjusted, avoiding the most mechanical parts of the work.
+*Boilerplate generation* - Integrating Prometheus, Loki, and Grafana involves a lot of repetitive configuration. AI generated base templates that we then reviewed and adjusted, avoiding the most mechanical parts of the work.
 
-*Test fixes* Approximately 15 existing tests broke during the initial migration. AI diagnosed the failures and proposed fixes quickly. Not a hard task, but one that would have consumed more time without assistance.
+*Test fixes* - Approximately 15 existing tests broke during the initial migration. AI diagnosed the failures and proposed fixes quickly. Not a hard task, but one that would have consumed more time without assistance.
 
-*Logging instrumentation.* Once we agreed on a logging convention, AI applied it consistently across the codebase, turning a tedious but low-value task into a matter of minutes.
+*Logging instrumentation* - Once we agreed on a logging convention, AI applied it consistently across the codebase, turning a tedious but low-value task into a matter of minutes.
 
 AI improved our velocity noticeably. The clearest benefit was lowering the barrier to unfamiliar tooling, because getting a working starting point is often the hardest step. The main drawback was overconfident output, particularly with Terraform provider-specific syntax, which occasionally introduced subtle errors we only caught through testing. This taught us to treat AI output as a draft to verify rather than a finished answer, and to always cross-reference official documentation for infrastructure-critical configuration.
 
