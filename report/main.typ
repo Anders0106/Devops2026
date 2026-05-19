@@ -206,9 +206,9 @@ Currently, the system always creates exactly one replica of each service, and if
 == Monitoring
 #author-tag("Anders Hansen")
 
-When managing a website, Availability is key. Monitoring facilitates availability and is an important aid in noticing and diagnosing a problem with a web application. 
+When managing a website, availability is key. Monitoring facilitates availability and is an important aid in noticing and diagnosing a problem with a web application. 
 
-In this project we use Grafana for visualization and Prometheus to collect and provide the data that is displayed. Prometheus scrapes the data from a frontend-, and a backend source.  The frontend data comes from an exposed endpoint on the website, "/metrics". This endpoint primarily provides business relevant metrics, such as how many cheeps or comments are created by users. Prometheus also scrapes the backend data through postgres-exporter. This data can be split up into reactive- and proactive Monitoring. We use reactive monitoring to see whether the database is active. Furthermore, we also use proactive monitoring to be able to identify problems in advance. Examples include monitoring the size of the database and also how high the cache hit rate is. E.g. when we monitor the database size we could set an alarm that notifies on 10% available disk space - proactive monitoring.
+In this project we use Grafana for visualization and Prometheus to collect and provide the data that is displayed. Prometheus scrapes the data from a frontend-, and a backend source. The frontend data comes from an exposed endpoint on the website, "/metrics". This endpoint primarily provides business relevant metrics, such as how many cheeps or comments are created by users. Prometheus also scrapes the backend data through postgres-exporter. This data can be split up into reactive- and proactive monitoring. We use reactive monitoring to see whether the database is active. Furthermore, we also use proactive monitoring to be able to identify problems in advance. Examples include monitoring the size of the database and also how high the cache hit rate is. For an example of proactive monitoring, when we monitor the database size we could set an alarm that notifies on 10% available disk space.
 
 #figure(
   image("images/PostgresMonitoring.png"),
@@ -218,9 +218,9 @@ In this project we use Grafana for visualization and Prometheus to collect and p
 == Logging
 #author-tag("Anders Hansen")
 
-While monitoring is key for availability, logging is key for diagnosing a problem. For this project we use the built-in logging functionality in the .NET library. Promtail collects these logs from the docker containers together with OS logs. They are then all sent to Loki, which is responsible for aggregating and storing them. At last, the logs are displayed chronoligacally in Grafana.
+Just as monitoring is key for availability, logging is key for diagnosing a problem. For this project we use the built-in logging functionality in the .NET library. Promtail collects these logs from the docker containers together with OS logs. They are then all sent to Loki, which is responsible for aggregating and storing them. At last, the logs are displayed chronologically in Grafana.
 
-The logs are structured. They are sent as JSON objects and include information that can help us debug/recall what has happened, such as: containerid, POST/GET, endpoint, responstime, IP-adress, a description of what was logged. 
+The logs are sent as structured JSON objects and include information that can help us debug/recall what has happened, such as: containerid, POST/GET, endpoint, response time, IP-address, and a description of what was logged. 
 
 We log many different things. Below are some grouped examples:
 
