@@ -239,39 +239,39 @@ Exceptions #linebreak()
 *System events* #linebreak()
 System logs #linebreak()
 
-Performance can also be tracked through responstime time, if this is too slow, something could be wrong and a request is instead logged as the type - warning.
+Performance can also be tracked through response time, if this is too slow, something could be wrong and a request is instead logged as a warning.
 
 
 == Security Hardening
 #author-tag("Anders Georg Frølich Hansen")
 
-Security is important, especially since our application contains sensetive information such as passwords. The following sections describes how we try to implement the defense in depth model.
+Security is important, especially since our application contains sensitive information such as passwords. The following sections describes how we try to implement the defense-in-depth model.
 
 *TLS* #linebreak()
-All communication between client and server is secured using HTTPS, ensuring that data is encrypted in transit.
+All communication between clients and the server is secured using HTTPS, ensuring that data is encrypted in transit.
 
 *Hashing* #linebreak()
 User passwords are never stored in plain text. Instead, they are stored using salted hashing.
 
 *Secret scanning and vulnerability checks* #linebreak()
-As part of the CI/CD pipeline, we automatically scan the codebase for accidentally committed secrets such as passwords. This is done using DevSkim and Semgrep with rules based on OWASP. These tools help identify common vulnerabilities such as SQL injection.
+As part of the CI/CD pipeline, we automatically scan the codebase for accidentally committed secrets such as passwords. This is done using DevSkim and Semgrep with rules based on the OWASP Top 10. These tools help identify common vulnerabilities such as SQL injection.
 
 *Network* #linebreak()
-All communication between clients and the server happens through a reverse proxy. This adds an additional security layer and the opportunity to filter various malicioius requests before they ever reach the server. E.g. ddos attacks by maximising amount of requests from one IP-adress.
+All communication between clients and the server happens through a reverse proxy. This adds an additional security layer and the opportunity to filter various malicious requests before they ever reach the server. For example, a DDoS attack by maximising the amount of requests from one IP-address would be filtered out by the reverse proxy.
 
-We keep as few ports open as possible. In figure @fig:firewallRules our firewall rules can be seen.
+We keep as few ports open as possible. In @fig:firewallRules our firewall rules can be seen.
 
 #figure(
   image("images/FirewallRules.png"),
-  caption: [Overview of what user each container from docker swarm is run as],
+  caption: [Overview of what user each container from Docker Swarm is run as],
 ) <fig:firewallRules>
 
 *Least privileges* #linebreak()
-Every container is run with least possible privileges. As seen in @fig:ContainerUser, most containers are not run as root.
+Every container is run with the least possible privileges. As seen in @fig:ContainerUser, most containers are not run as the root user.
 
 #figure(
   image("images/ContainerUser.png"),
-  caption: [Overview of what user each container from docker swarm is run as],
+  caption: [Overview of what user each container from Docker Swarm is run as],
 ) <fig:ContainerUser>
 
 // =========================
@@ -286,7 +286,7 @@ Another big issue was the migration from SQLite to PostgreSQL (commit #link("htt
 
 During the maintenance phase, we went through a round of security hardening after realizing the system had some gaps. In a series of commits we added Caddy as a reverse proxy (#link("https://github.com/Anders0106/Devops2026/commit/9adb05c")[`9adb05c`]), bound all service ports to localhost (#link("https://github.com/Anders0106/Devops2026/commit/356062b")[`356062b`]), removed root as the running user from our containers (#link("https://github.com/Anders0106/Devops2026/commit/4113645")[`4113645`]), and added Semgrep for static security analysis (#link("https://github.com/Anders0106/Devops2026/commit/ee46c2e")[`ee46c2e`]). Going through this as a dedicated step made it clear how many small attack surfaces a running system can accumulate without much notice.
 
-The DevOps style of our work was focused on improving the CI/CD flow constantly throughout development. The focus was on fixing issues and making sure that if they reappear, we know right away. Also trying to automate as many things as possible, which made the codebase much easier to work with as the project progressed.
+The DevOps style of our work was focused on improving the CI/CD flow constantly throughout development. The focus was on fixing issues and making sure that if they reappear, we know right away, along with trying to automate as many things as possible, which made the codebase much easier to work with as the project progressed.
 
 // =========================
 // 5. Use of Generative AI
@@ -296,13 +296,13 @@ The DevOps style of our work was focused on improving the CI/CD flow constantly 
 
 During the project we used Claude (Sonnet 4.6 and Opus 4.6) and GPT-5.4 as generative AI assistants. The two providers were used interchangeably, choosing whichever gave cleaner output for a given task.
 
-*Learning new tooling* Terraform and Docker Swarm were new to the team. Rather than reading documentation from scratch, we used AI to get targeted explanations and working examples we could adapt to our setup. This significantly reduced the time needed to become productive with each tool.
+*Learning new tooling* - Terraform and Docker Swarm were new to the team. Rather than reading documentation from scratch, we used AI to get targeted explanations and working examples we could adapt to our setup. This significantly reduced the time needed to become productive with each tool.
 
-*Boilerplate generation* Integrating Prometheus, Loki, and Grafana involves a lot of repetitive configuration. AI generated base templates that we then reviewed and adjusted, avoiding the most mechanical parts of the work.
+*Boilerplate generation* - Integrating Prometheus, Loki, and Grafana involves a lot of repetitive configuration. AI generated base templates that we then reviewed and adjusted, avoiding the most mechanical parts of the work.
 
-*Test fixes* Approximately 15 existing tests broke during the initial migration. AI diagnosed the failures and proposed fixes quickly. Not a hard task, but one that would have consumed more time without assistance.
+*Test fixes* - Approximately 15 existing tests broke during the initial migration. AI diagnosed the failures and proposed fixes quickly. Not a hard task, but one that would have consumed more time without assistance.
 
-*Logging instrumentation.* Once we agreed on a logging convention, AI applied it consistently across the codebase, turning a tedious but low-value task into a matter of minutes.
+*Logging instrumentation* - Once we agreed on a logging convention, AI applied it consistently across the codebase, turning a tedious but low-value task into a matter of minutes.
 
 AI improved our velocity noticeably. The clearest benefit was lowering the barrier to unfamiliar tooling, because getting a working starting point is often the hardest step. The main drawback was overconfident output, particularly with Terraform provider-specific syntax, which occasionally introduced subtle errors we only caught through testing. This taught us to treat AI output as a draft to verify rather than a finished answer, and to always cross-reference official documentation for infrastructure-critical configuration.
 
