@@ -256,10 +256,18 @@ All communication between client and server is secured using HTTPS, ensuring tha
 *Hashing*
 User passwords are never stored in plain text. Instead, they are stored using salted hashing.
 
+*Secret scanning and vulnerability checks*
+As part of the CI/CD pipeline, we automatically scan the codebase for accidentally committed secrets such as passwords. This is done using DevSkim and Semgrep with rules based on OWASP. These tools help identify common vulnerabilities such as SQL injection.
+
 *Network*
 All communication between clients and the server happens through a reverse proxy. This adds an additional security layer and the opportunity to filter various malicioius requests before they ever reach the server. E.g. ddos attacks by maximising amount of requests from one IP-adress.
 
 We keep as few ports open as possible. In figure @fig:firewallRules our firewall rules can be seen.
+
+#figure(
+  image("images/firewallRules.png"),
+  caption: [Overview of what user each container from docker swarm is run as],
+) <fig:ContainerUser>
 
 *Least privileges*
 Every container is run with least possible privileges. As seen in @fig:ContainerUser, most containers are not run as root.
