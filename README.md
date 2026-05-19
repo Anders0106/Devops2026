@@ -104,7 +104,17 @@ make test      # Run all tests
 make clean     # Clean build artifacts
 make restore   # Restore NuGet packages
 ```
-## CI/CD Pipeline in Action
+## GIF
+
+![Monitoring Dashboards in Action](report/images/Monitoring.gif)
+    - Author: Anders Georg Frølich Hansen 
+![Logging Dashboards in Action](report/images/Logging.gif)
+    - Author: Alexander Frederiksen & David Nicholas Nielsen 
+![IaC in Action](report/images/iac.gif)
+    - Author: Phillip Nikolai Rasmussen   
+![IaC in Action](report/images/cicd-demo.gif)
+    - Author: Alexander Rossau
+
 
 ![CI/CD pipeline demo](report/images/cicd-demo.gif)
 
@@ -202,3 +212,5 @@ Contributions are welcome. For major changes, please open an issue first to disc
 ## License
 
 This project is released into the public domain under the [Unlicense](LICENSE).
+
+      

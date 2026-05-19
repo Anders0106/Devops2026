@@ -47,7 +47,8 @@
   #v(0.4em)
   #text(size: 14pt)[A Report on Design, Operation, and Evolution] \
   #v(2em)
-  #text(size: 13pt, weight: "bold")[Group C] \
+  #text(size: 13pt, weight: "bold")[Group C - youCanCUs] \
+  //#text(size: 13pt, weight: "bold")[youCanCUs] \
   #v(1em)
   #text(size: 11pt)[
     Alexander Rossau \<ross\@itu.dk\> \
