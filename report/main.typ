@@ -267,7 +267,7 @@ We keep as few ports open as possible. In @fig:firewallRules our firewall rules 
 
 #figure(
   image("images/FirewallRules.png"),
-  caption: [Overview of what user each container from Docker Swarm is run as],
+  caption: [Overviev of firewall rules using ufw],
 ) <fig:firewallRules>
 
 *Least privileges* #linebreak()
