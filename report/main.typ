@@ -193,6 +193,11 @@ Regarding GitHub Actions, we have set up three workflows:
 2. *DevSkim Security Scan*: runs on every push to the `main` branch, scanning for security issues with DevSkim and failing if any are found.
 3. *Build and Push Docker Image on Release*: runs whenever a new release is published, building a new Docker image, pushing it to Docker Hub.
 
+The pipeline is illustrated in the figure below.
+#figure(caption: [CI/CD Pipeline. This diagram shows the flow from local code changes to deployment. Note that other containers are also running on the server, such as those used for the database and the monitoring stack.], 
+  image("images/CICD.png")
+)
+
 == Deployment and Release
 #author-tag("David Nicholas Nielsen")
 
