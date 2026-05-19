@@ -265,9 +265,9 @@ All communication between clients and the server happens through a reverse proxy
 We keep as few ports open as possible. In figure @fig:firewallRules our firewall rules can be seen.
 
 #figure(
-  image("images/firewallRules.png"),
+  image("images/FirewallRules.png"),
   caption: [Overview of what user each container from docker swarm is run as],
-) <fig:ContainerUser>
+) <fig:firewallRules>
 
 *Least privileges*
 Every container is run with least possible privileges. As seen in @fig:ContainerUser, most containers are not run as root.
