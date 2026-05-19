@@ -22,7 +22,7 @@ jobs:
 
       - name: Install Typst
         run: |
-          curl -fsSL \
+          curl --proto '=https' --tlsv1.2 -fsSL \
             https://github.com/typst/typst/releases/latest/download/typst-x86_64-unknown-linux-musl.tar.xz \
             | tar -xJf - --strip-components=1
           sudo install -m 755 typst /usr/local/bin/typst
