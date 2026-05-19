@@ -1,0 +1,47 @@
+name: Build Report PDF
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'report/**'
+  workflow_dispatch:
+
+jobs:
+  build-pdf:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install DejaVu fonts
+        run: sudo apt-get install -y fonts-dejavu-core
+
+      - name: Install Typst
+        run: |
+          curl -fsSL \
+            https://github.com/typst/typst/releases/latest/download/typst-x86_64-unknown-linux-musl.tar.xz \
+            | tar -xJf - --strip-components=1
+          sudo install -m 755 typst /usr/local/bin/typst
+
+      - name: Compile report
+        run: typst compile report/main.typ report/build/BSc_group_c.pdf
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BSc_group_c
+          path: report/build/BSc_group_c.pdf
+
+      - name: Commit PDF to repository
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add report/build/BSc_group_c.pdf
+          if ! git diff --staged --quiet; then
+            git commit -m "build: compile report PDF [skip ci]"
+            git push
+          fi
