@@ -123,17 +123,15 @@ On our main deployment used in this course, we use Tailscale Funnel to expose th
      columns: (auto, 1fr, 1fr),
      align: (left, left, left),
      table.header[*Layer*][*Tool / Technology*][*Purpose*],
-     //[Runtime], [Bun + Elysia], [HTTP server, request handling],
-     [Runtime], [ASP.NET Core (.NET)], [HTTP server, request handling],
-     [ORM], [Entity Framework core], [Database access],
-     //[Data], [PostgreSQL @ PlanetScale], [Primary persistence],
-     [Data], [PostgreSQL (Docker container, accessed via Npgsql/EF Core)], [Primary persistence],
+     [Runtime], [ASP.NET Core (.NET 8)], [HTTP server, request handling],
+     [ORM], [Entity Framework Core], [Database access],
+     [Data], [PostgreSQL (Docker container, accessed via Npgsql and EF Core)], [Primary persistence],
      [Containerization], [Docker], [Service isolation & deployment],
-     [Infra], [Docker Swarm + Terraform (Hetzner/OCI clode)], [Hosting & orchestration],
+     [Infra], [Docker Swarm + Terraform (DigitalOcean)], [Hosting & orchestration],
      [CI/CD], [GitHub Actions], [Build, test, deploy],
-     [Observability (Monitoring)], [Prometheus], [Metrics collaction],
+     [Observability (Monitoring)], [Prometheus], [Metrics collection],
      [Observability (Logging)], [Loki + Promtail], [Log aggregation],
-     [Observability (Visualization)], [Grafana], [Dashboard],
+     [Observability (Visualization)], [Grafana], [Dashboard visualization],
      
      //[Secrets], [Doppler], [Secret distribution],
    ),
@@ -150,21 +148,22 @@ For observability, we are using Prometheus to collect metrics from the program, 
 
 == Current State
 #author-tag("Alexande F")
-Our system are using GitHub Actions for continuous integration and automated validation. The CI pipeline makes static analysis, automated builds, database-backed testing, and browser-based integration testing with ever commit.
 
-The project contains four different kinds of automated test like unit tests, integration tests, UI tests, and end-to-end tests. These test are done in the CI pipeline using `make test`. 
+Our system uses GitHub Actions for continuous integration and automated validation. The CI pipeline makes static analysis, automated builds, database-backed testing, and browser-based integration testing with every commit.
 
-Static analysis and security scanning are done using Semgrep with rulesets targeting C\#, Dockerfiles, and the OWASP Top 10. The CI workflow also provisions a PostgreSQL container under testing to support the integration tests against a database environment. The end-to-end testing supports the Playwright browser automation test.
+The project contains four different kinds of automated tests: unit tests, integration tests, UI tests, and end-to-end tests. These tests are done in the CI pipeline using `make test`. 
 
-The system as it is right now contains 34 build warnings like 'nullable-reference warnings', 'logging-analysis warnings', 'unused-variable warnings' and 'test-analyzer warnings'. In additon to 1 known package warning (`NU1903` there are related to the `Microsoft.Build 17.8.3`). These warnings mostly concerns nullable-reference handling and package dependency issues. Even though this warnings is there, our  system builds fine and runs successfully.
+Static analysis and security scanning are done using Semgrep with rulesets targeting C\#, Dockerfiles, and the OWASP Top 10. The CI workflow also provisions a PostgreSQL container during testing to support the integration tests against a database environment. The end-to-end testing includes a Playwright browser automation test for the web UI.
+
+The system as it is right now contains 34 build warnings like 'nullable-reference warnings', 'logging-analysis warnings', 'unused-variable warnings' and 'test-analyzer warnings'. In addition to 1 known package warning (`NU1903` related to the `Microsoft.Build 17.8.3`). These warnings mostly concern nullable-reference handling and package dependency issues. Even though these warnings are present, our system builds fine and runs successfully.
 
 Our repository has 3 GitHub Actions workflows (`ci.yml`, `devskim.yml`, and `release-docker.yml`) supporting the automated testing, the security scanning, and also the deployment processes.
 
 
-#figure(caption: [warning part 1], 
+#figure(caption: [Warnings part 1], 
   image("images/warnings1.png")
 )
-#figure(caption: [warning part 2], 
+#figure(caption: [Warnings part 2], 
   image("images/warnings2.png")
 )
 
