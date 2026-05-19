@@ -104,19 +104,22 @@ make test      # Run all tests
 make clean     # Clean build artifacts
 make restore   # Restore NuGet packages
 ```
-## GIF
 
+## GIF
+### Monitoring Dashboards in Action
 ![Monitoring Dashboards in Action](report/images/Monitoring.gif)
     - Author: Anders Georg Frølich Hansen 
+### Logging Dashboards in Action   
 ![Logging Dashboards in Action](report/images/Logging.gif)
     - Author: Alexander Frederiksen & David Nicholas Nielsen 
+### IaC in Action   
 ![IaC in Action](report/images/iac.gif)
-    - Author: Phillip Nikolai Rasmussen   
-![IaC in Action](report/images/cicd-demo.gif)
+    - Author: Phillip Nikolai Rasmussen 
+### CI/CD in Action      
+![CI/CD in Action](report/images/cicd-demo.gif)
     - Author: Alexander Rossau
 
 
-![CI/CD pipeline demo](report/images/cicd-demo.gif)
 
 ## Deployment
 
