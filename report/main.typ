@@ -209,23 +209,17 @@ Currently, the system always creates exactly one replica of each service, and if
 == Monitoring
 #author-tag("Anders Hansen")
 
-What is monitored (golden signals + business metrics), collection mechanism,
-dashboards. Link the dashboards.
-
 When managing a website, Availability is key. Monitoring facilitates availability and is an important aid in noticing and diagnosing a problem with a web application. 
 
 In this project we use Grafana for visualization and Prometheus to collect and provide the data that is displayed. Prometheus scrapes the data from a frontend-, and a backend source.  The frontend data comes from an exposed endpoint on the website, "/metrics". This endpoint primarily provides business relevant metrics, such as how many cheeps or comments are created by users. Prometheus also scrapes the backend data through postgres-exporter. This data can be split up into reactive- and proactive Monitoring. We use reactive monitoring to see whether the database is active. Furthermore, we also use proactive monitoring to be able to identify problems in advance. Examples include monitoring the size of the database and also how high the cache hit rate is. E.g. when we monitor the database size we could set an alarm that notifies on 10% available disk space - proactive monitoring.
 
 #figure(
-  image("images/PostgresMonitoring.png", width: 90%),
+  image("images/PostgresMonitoring.png"),
   caption: [Monitoring overview of postgres database],
 ) <fig:monitoring>
 
 == Logging
 #author-tag("Anders Hansen")
-
-What is logged, structured-log conventions, aggregation, retention. Link the logging UI.
-
 
 While monitoring is key for availability, logging is key for diagnosing a problem. For this project we use the built-in logging functionality in the .NET library. Promtail collects these logs from the docker containers together with OS logs. They are then all sent to Loki, which is responsible for aggregating and storing them. At last, the logs are displayed chronoligacally in Grafana.
 
@@ -254,10 +248,6 @@ Performance can also be tracked through responstime time - if this is too slow, 
 == Security Hardening
 #author-tag("Anders Hansen")
 
-Threat-model summary and concrete mitigations: TLS, secrets management, dependency
-scanning, container hardening, branch protection, SAST/DAST. Reference any incidents
-handled.
-
 Security is important, especially since our application contains sensetive information such as passwords. The following sections describes how we try to implement the defense in depth model.
 
 *TLS*
@@ -269,17 +259,13 @@ User passwords are never stored in plain text. Instead, they are stored using sa
 *Network*
 All communication between clients and the server happens through a reverse proxy. This adds an additional security layer and the opportunity to filter various malicioius requests before they ever reach the server. E.g. ddos attacks by maximising amount of requests from one IP-adress.
 
-
-We keep as few ports open as possible. In figure ?? our firewall rules can be seen.
-
-SHOULD WRITE ABOUT PROBLEMS WITH FIREWALL WHEN DISTRIBUITING SERVER??
-SÆT BILLEDE IND AF "ufw status numbered"
+We keep as few ports open as possible. In figure @fig:firewallRules our firewall rules can be seen.
 
 *Least privileges*
 Every container is run with least possible privileges. As seen in @fig:ContainerUser, most containers are not run as root.
 
 #figure(
-  image("images/ContainerUser.png", width: 90%),
+  image("images/ContainerUser.png"),
   caption: [Overview of what user each container from docker swarm is run as],
 ) <fig:ContainerUser>
 
