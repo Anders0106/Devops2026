@@ -86,7 +86,7 @@ This report documents the design, operation, and evolution of _ITU-MiniTwit_, a 
 == Architecture and Design
 #author-tag("Alexander Rossau")
 
-*Allocation viewpoint.* @fig:deployment shows the production deployment. The
+*Allocation viewpoint* @fig:deployment shows the production deployment. The
 system runs as a Docker Swarm stack on a DigitalOcean droplet. This can be deployed with a few Terraform commands, using the included Terraform files in the `infrastructure` directory.
 
 Caddy acts as a reverse proxy with IP-hash load balancing, forwarding HTTP traffic to the `chirp-web` application container. The application connects to a PostgreSQL~17 database over the internal Docker overlay network. Observability is co-located: Prometheus scrapes application metrics (exposed via `/metrics`) and a `postgres-exporter` sidecar. Promtail ships container logs to Loki and Grafana queries both Prometheus and Loki for dashboards and alerting. Shepherd polls the GitHub Container Registry and performs rolling updates when a new image tagged `latest` is published. We have used this rolling-update pattern since the start of the project to enable zero-downtime deployments, with manual redeploys and database migrations being the exceptions where downtime did occur.
@@ -286,7 +286,7 @@ Another big issue was the migration from SQLite to PostgreSQL (commit #link("htt
 During the maintenance phase, we went through a round of security hardening after realizing the system had some gaps. In a series of commits we added Caddy as a reverse proxy (#link("https://github.com/Anders0106/Devops2026/commit/9adb05c")[`9adb05c`]), bound all service ports to localhost (#link("https://github.com/Anders0106/Devops2026/commit/356062b")[`356062b`]), removed root as the running user from our containers (#link("https://github.com/Anders0106/Devops2026/commit/4113645")[`4113645`]), and added Semgrep for static security analysis (#link("https://github.com/Anders0106/Devops2026/commit/ee46c2e")[`ee46c2e`]). Going through this as a dedicated step made it clear how many small attack surfaces a running system can accumulate without much notice.
 
 The DevOps style of our work was focused on improving the CI/CD flow constantly throughout development. The focus was on fixing issues and making sure that if they reappear, we know right away, along with trying to automate as many things as possible, which made the codebase much easier to work with as the project progressed.
-
+#pagebreak()
 // =========================
 // 5. Use of Generative AI
 // =========================
@@ -295,13 +295,13 @@ The DevOps style of our work was focused on improving the CI/CD flow constantly 
 
 During the project we used Claude (Sonnet 4.6 and Opus 4.6) and GPT-5.4 as generative AI assistants. The two providers were used interchangeably, choosing whichever gave cleaner output for a given task.
 
-*Learning new tooling* - Terraform and Docker Swarm were new to the team. Rather than reading documentation from scratch, we used AI to get targeted explanations and working examples we could adapt to our setup. This significantly reduced the time needed to become productive with each tool.
+*Learning new tooling* Terraform and Docker Swarm were new to the team. Rather than reading documentation from scratch, we used AI to get targeted explanations and working examples we could adapt to our setup. This significantly reduced the time needed to become productive with each tool.
 
-*Boilerplate generation* - Integrating Prometheus, Loki, and Grafana involves a lot of repetitive configuration. AI generated base templates that we then reviewed and adjusted, avoiding the most mechanical parts of the work.
+*Boilerplate generation* Integrating Prometheus, Loki, and Grafana involves a lot of repetitive configuration. AI generated base templates that we then reviewed and adjusted, avoiding the most mechanical parts of the work.
 
-*Test fixes* - Approximately 15 existing tests broke during the initial migration. AI diagnosed the failures and proposed fixes quickly. Not a hard task, but one that would have consumed more time without assistance.
+*Test fixes* Approximately 15 existing tests broke during the initial migration. AI diagnosed the failures and proposed fixes quickly. Not a hard task, but one that would have consumed more time without assistance.
 
-*Logging instrumentation* - Once we agreed on a logging convention, AI applied it consistently across the codebase, turning a tedious but low-value task into a matter of minutes.
+*Logging instrumentation* Once we agreed on a logging convention, AI applied it consistently across the codebase, turning a tedious but low-value task into a matter of minutes.
 
 AI improved our velocity noticeably. The clearest benefit was lowering the barrier to unfamiliar tooling, because getting a working starting point is often the hardest step. The main drawback was overconfident output, particularly with Terraform provider-specific syntax, which occasionally introduced subtle errors we only caught through testing. This taught us to treat AI output as a draft to verify rather than a finished answer, and to always cross-reference official documentation for infrastructure-critical configuration.
 
