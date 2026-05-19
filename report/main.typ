@@ -175,34 +175,31 @@ Our repository has 3 GitHub Actions workflows (`ci.yml`, `devskim.yml`, and `rel
 == CI/CD Pipeline
 #author-tag("David Nicholas Nielsen")
 
-The CI/CD pipeline is implemented using the tools listed below:
+The CI/CD pipeline is implemented using the following tools:
 - We use Git and GitHub for version control and code hosting.
-- We use GitHub Actions for automatically testing and deploying the application.
-- We use Docker for containerization, Docker Hub for container registry, and Docker Swarm for orchestration and deployment.
-- We use Terraform for infrastructure as code, provisioning our DigitalOcean droplet and Docker Swarm cluster.
+- We use GitHub Actions for automated testing and building the application.
+- We use Docker for containerization, GitHub Container Registry for container image hosting, and Docker Swarm for orchestration and deployment.
+- We use Terraform for infrastructure-as-code (IaC), provisioning our DigitalOcean droplet and Docker Swarm cluster.
 
-// #figure(
-//   image("images/cicd.png", width: 95%),
-//   caption: [CI/CD pipeline from commit to production.],
-// ) <fig:cicd>
-
-// End-to-end stages and tools, including triggers, gates, and artifacts produced.
-
-Regarding GitHub Actions, we have set up three workflows:
+Regarding GitHub Actions, we have set up the following workflows:
 1. *CI*: runs on every push and pull request, executing tests, as well as static analysis with Semgrep. It enforces quality gates by failing if tests do not pass or if Semgrep finds critical issues.
 2. *DevSkim Security Scan*: runs on every push to the `main` branch, scanning for security issues with DevSkim and failing if any are found.
-3. *Build and Push Docker Image on Release*: runs whenever a new release is published, building a new Docker image, pushing it to Docker Hub.
+3. *Build and Push Docker Image on Release*: runs whenever a new release is published, building a new Docker image, pushing it to GitHub Container Registry.
+
+The pipeline is illustrated in the figure below.
+#figure(caption: [CI/CD Pipeline. This diagram shows the flow from local code changes to deployment. Note that other containers are also running on the server, such as those used for the database and the monitoring stack.], 
+  image("images/CICD.png")
+)
 
 == Deployment and Release
 #author-tag("David Nicholas Nielsen")
 
-The Docker Swarm is configured to automatically update to use the newest available release of ITU-MiniTwit. We use a tool called _Shepherd_ periodically checks for new releases. If a new release is found, it performs a rolling update of the stack, meaning that the new version is deployed to one replica at a time. In case of a failed deployment, the stack will automatically roll back to the previous version.
-// Versioning scheme, environments, rollout strategy, rollback. Link a representative release.
+Docker Swarm is configured to automatically update to use the newest available release of ITU-MiniTwit. We use a tool called _Shepherd_ that periodically checks for new releases. If a new release is found, it performs a rolling update of the stack, meaning that the new version is deployed to one replica at a time. In case of a failed deployment, the stack will automatically roll back to the previous version.
 
 == Availability and Scaling
 #author-tag("David Nicholas Nielsen")
 
-Currently, the system always creates exactly one replica of each service, and if a replica fails, the container is restarted. To increase availability, we could scale horizontally by increasing the number of replicas and use Caddy for load-balancing. The number of replicas could be set to a higher number, or it could be adjusted dynamically based on the load. This would allow the system to handle more traffic and provide tolerance in case of failures. Of course, in a real-world scenario, simply increasing the number of replicas may not be enough to ensure high availability, as we would need to consider other possible bottlenecks, such as the single database.
+Currently, the system always creates exactly one replica of each service, and if a replica fails, the container is restarted. To increase availability, we could scale horizontally by increasing the number of replicas and use Caddy for load-balancing. The number of replicas could be set to a higher number, or it could be adjusted dynamically based on the load. This would allow the system to handle more traffic and provide tolerance in case of failures. Of course, in a real-world scenario, simply increasing the number of replicas may not be enough to ensure high availability, as we would need to consider other possible bottlenecks, such as the single-replica database.
 
 //Replicas, autoscaling, multi-region setup, failure modes, recovery procedures.
 
@@ -285,7 +282,7 @@ Every container is run with least possible privileges. As seen in @fig:Container
 
 We had some issues figuring out why a lot of follow and cheep API requests were failing. It ended up being a culmination of many small issues not considered when the functions were first created, such as case-sensitive usernames and whitespace handling. This can be seen in commits #link("https://github.com/Anders0106/Devops2026/commit/3428504")[`3428504`], #link("https://github.com/Anders0106/Devops2026/commit/4b511f6")[`4b511f6`], and #link("https://github.com/Anders0106/Devops2026/commit/f05129f")[`f05129f`]. The issue still persisted, so we added logging in commit #link("https://github.com/Anders0106/Devops2026/commit/5d61e5d")[`5d61e5d`] to highlight exactly where things were going wrong.
 
-Another big issue was the migration from SQLite to PostgreSQL (commit #link("https://github.com/Anders0106/Devops2026/commit/315f361")[`315f361`]). SQLite had been handling certain values case-insensitively, which PostgreSQL does not, so we needed a conversion script to fix the existing data (commit #link("https://github.com/Anders0106/Devops2026/commit/be71171")[`be71171`]). On top of that, a lot of tests broke, leading to a string of quick fixes from commits #link("https://github.com/Anders0106/Devops2026/commit/65de226")[`65de226`] to #link("https://github.com/Anders0106/Devops2026/commit/970e37c")[`970e37c`], not fully resolved until #link("https://github.com/Anders0106/Devops2026/commit/8c816e2")[`8c816e2`] two weeks later.
+Another big issue was the migration from SQLite to PostgreSQL (commit #link("https://github.com/Anders0106/Devops2026/commit/315f361")[`315f361`]). SQLite had been handling certain values case-insensitively, which PostgreSQL does not, so we needed a conversion script to fix the existing data (commit #link("https://github.com/Anders0106/Devops2026/commit/be71171")[`be71171`]). On top of that, a lot of tests broke, leading to a string of quick fixes from commits #link("https://github.com/Anders0106/Devops2026/commit/65de226")[`65de226`] to #link("https://github.com/Anders0106/Devops2026/commit/970e37c")[`970e37c`], not fully resolved until #link("https://github.com/Anders0106/Devops2026/commit/8c816e2")[`8c816e2`] two weeks later. This caused downtime for our application.
 
 During the maintenance phase, we went through a round of security hardening after realizing the system had some gaps. In a series of commits we added Caddy as a reverse proxy (#link("https://github.com/Anders0106/Devops2026/commit/9adb05c")[`9adb05c`]), bound all service ports to localhost (#link("https://github.com/Anders0106/Devops2026/commit/356062b")[`356062b`]), removed root as the running user from our containers (#link("https://github.com/Anders0106/Devops2026/commit/4113645")[`4113645`]), and added Semgrep for static security analysis (#link("https://github.com/Anders0106/Devops2026/commit/ee46c2e")[`ee46c2e`]). Going through this as a dedicated step made it clear how many small attack surfaces a running system can accumulate without much notice.
 
@@ -297,7 +294,7 @@ The DevOps style of our work was focused on improving the CI/CD flow constantly 
 = Use of Generative AI
 #author-tag("Phillip Nikolai Rasmussen")
 
-During the project we used Claude (Sonnet 4.6 and Opus 4.6) and GPT-4o as generative AI assistants. The two providers were used interchangeably, choosing whichever gave cleaner output for a given task.
+During the project we used Claude (Sonnet 4.6 and Opus 4.6) and GPT-5.4 as generative AI assistants. The two providers were used interchangeably, choosing whichever gave cleaner output for a given task.
 
 *Learning new tooling* Terraform and Docker Swarm were new to the team. Rather than reading documentation from scratch, we used AI to get targeted explanations and working examples we could adapt to our setup. This significantly reduced the time needed to become productive with each tool.
 
