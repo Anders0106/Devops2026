@@ -4,8 +4,8 @@
 // Build: `typst compile report.typ build/BSc_group_X.pdf`
 
 #set document(
-  title: "ITU-MiniTwit — Group X Report",
-  author: ("Member A", "Member B", "Member C", "Member D", "Phillip Nikolai Rasmussen"),
+  title: "ITU-MiniTwit — Group C Report",
+  author: ("Alexander Rossau", "Alexander Frederiksen", "David Nicholas Nielsen", "Anders Georg Frølich Hansen", "Phillip Nikolai Rasmussen"),
 )
 
 #set page(
@@ -47,13 +47,13 @@
   #v(0.4em)
   #text(size: 14pt)[A Report on Design, Operation, and Evolution] \
   #v(2em)
-  #text(size: 13pt, weight: "bold")[Group X] \
+  #text(size: 13pt, weight: "bold")[Group C] \
   #v(1em)
   #text(size: 11pt)[
     Alexander Rossau \<ross\@itu.dk\> \
     Alexander Frederiksen \<alefr\@itu.dk\> \
     David Nicholas Nielsen \<davn\@itu.dk\> \
-    Member D \<id4\@itu.dk\> \
+    Anders Georg Frølich Hansen \<ageh\@itu.dk\> \
     Phillip Nikolai Rasmussen \<phir\@itu.dk\>
   ] \
   #v(2em)
@@ -112,8 +112,10 @@ On our main deployment used in this course, we use Tailscale Funnel to expose th
   caption: [Component & Connector viewpoint - sequence diagram for posting a cheep.],
 ) <fig:sequence>
 
+#pagebreak()
+
 == Dependencies
-//#author-tag("Alexander F")
+#author-tag("Alexander F")
 
 #figure(
    table(
@@ -146,8 +148,7 @@ The system is deployed using Docker Swarm, and the infrastructure is from using 
 For observability, we are using Prometheus to collect metrics from the program, while Loki and Promtail handle the log aggregation and Grafana is used to visualize both the metrics and the logs through its dashboards.
 
 == Current State
-#author-tag("Member B")
-//#author-tag("Alexande F")
+#author-tag("Alexande F")
 Our system are using GitHub Actions for continuous integration and automated validation. The CI pipeline makes static analysis, automated builds, database-backed testing, and browser-based integration testing with ever commit.
 
 The project contains four different kinds of automated test like unit tests, integration tests, UI tests, and end-to-end tests. These test are done in the CI pipeline using `make test`. 
