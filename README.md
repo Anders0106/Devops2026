@@ -104,9 +104,22 @@ make test      # Run all tests
 make clean     # Clean build artifacts
 make restore   # Restore NuGet packages
 ```
-## CI/CD Pipeline in Action
 
-![CI/CD pipeline demo](report/images/cicd-demo.gif)
+## GIF
+### Monitoring Dashboards in Action
+![Monitoring Dashboards in Action](report/images/Monitoring.gif)
+    - Author: Anders Georg Frølich Hansen 
+### Logging Dashboards in Action   
+![Logging Dashboards in Action](report/images/Logging.gif)
+    - Author: Alexander Frederiksen & David Nicholas Nielsen 
+### IaC in Action   
+![IaC in Action](report/images/iac.gif)
+    - Author: Phillip Nikolai Rasmussen 
+### CI/CD in Action      
+![CI/CD in Action](report/images/cicd-demo.gif)
+    - Author: Alexander Rossau
+
+
 
 ## Deployment
 
@@ -132,6 +145,8 @@ cp terraform.tfvars.example terraform.tfvars
 terraform init
 terraform apply
 ```
+
+![iac](report/images/iac.gif)
 
 Required variables: `do_token`, `github_image_repo`. See `variables.tf` for all options and defaults.
 
@@ -202,3 +217,5 @@ Contributions are welcome. For major changes, please open an issue first to disc
 ## License
 
 This project is released into the public domain under the [Unlicense](LICENSE).
+
+      
